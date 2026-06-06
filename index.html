@@ -392,12 +392,12 @@ tr:hover td{background:#fafaf9}
 // ─── CONFIG ───────────────────────────────────────────
 const SUPABASE_URL = 'https://ksjhmffcbsbilluspwvp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_LheV41B97hnmP7_sDDKoYQ_2maPPBv0';
-const RESEND_KEY   = 're_hucZwtEQ_KxxkB1oybqV6Hy1RFybt2uMg'; // key hardcoded por defecto
+// La API key de Resend vive en la Edge Function de Supabase (seguro, sin exponer en el browser)
 
 let CONFIG = {
   monto: 100, banco: '', nombreEvento: 'Evento',
   qrPayImg: '', password: 'admin123',
-  resendKey: RESEND_KEY,
+  resendKey: '',
   fromEmail: 'onboarding@resend.dev',
   fromName: 'Equipo del Evento', emailMsg: ''
 };
@@ -461,7 +461,6 @@ async function sb(path, opts={}) {
 
 // ─── EMAIL via Resend (fetch directo, sin SDK) ─────────
 async function enviarEmailAprobacion(reg) {
-  const key = CONFIG.resendKey || RESEND_KEY;
   const from = CONFIG.fromEmail || 'onboarding@resend.dev';
   const fromName = CONFIG.fromName || 'Equipo del Evento';
   const evento = CONFIG.nombreEvento || 'Evento';
@@ -496,52 +495,53 @@ async function enviarEmailAprobacion(reg) {
 </td></tr>
 </table></body></html>`;
 
+  // Llamar a la Edge Function de Supabase (evita CORS de Resend)
   try {
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${key}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: `${fromName} <${from}>`,
-        to: [reg.correo],
-        subject: `✅ ¡Tu registro fue aprobado! — ${evento}`,
-        html
-      })
-    });
+    const res = await fetch(
+      `${SUPABASE_URL}/functions/v1/send-email`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+        },
+        body: JSON.stringify({
+          to: reg.correo,
+          subject: `✅ ¡Tu registro fue aprobado! — ${evento}`,
+          html,
+          from,
+          fromName,
+        }),
+      }
+    );
     const data = await res.json();
     if (!res.ok) {
-      console.error('Resend error:', data);
-      return { ok: false, error: data.message || JSON.stringify(data) };
+      console.error('Edge Function error:', data);
+      return { ok: false, error: data.error?.message || JSON.stringify(data) };
     }
     return { ok: true };
   } catch(e) {
-    console.error('Email fetch error:', e);
+    console.error('Edge Function fetch error:', e);
     return { ok: false, error: e.message };
   }
 }
 
 async function testEmail() {
-  const key = document.getElementById('cfg-resend-key').value || RESEND_KEY;
   const from = document.getElementById('cfg-from-email').value || 'onboarding@resend.dev';
   const resEl = document.getElementById('test-email-res');
-  resEl.textContent = 'Enviando...';
-  resEl.className = '';
+  resEl.textContent = 'Enviando correo de prueba...';
   resEl.style.cssText = 'margin-top:.65rem;font-size:.85rem;padding:.65rem .875rem;border-radius:8px;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe';
   resEl.classList.remove('hidden');
 
-  // Guardamos temporalmente para el test
-  const tmpKey = CONFIG.resendKey; const tmpFrom = CONFIG.fromEmail;
-  CONFIG.resendKey = key; CONFIG.fromEmail = from;
-
+  const tmpFrom = CONFIG.fromEmail;
+  CONFIG.fromEmail = from;
   const result = await enviarEmailAprobacion({
     id: 'test-00000000-0000-0000-0000-000000000000',
     nombre: 'Usuario de Prueba',
     correo: from,
     ciudad: 'Cochabamba'
   });
-  CONFIG.resendKey = tmpKey; CONFIG.fromEmail = tmpFrom;
+  CONFIG.fromEmail = tmpFrom;
 
   if (result.ok) {
     resEl.style.cssText = 'margin-top:.65rem;font-size:.85rem;padding:.65rem .875rem;border-radius:8px;background:#f0faf7;color:#1D6B5A;border:1px solid #a7f3d0';
