@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro al Evento</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F7F5F0;--card:#fff;--text:#1a1a1a;--muted:#6b7280;--border:#e5e1d8;
+  --accent:#B85C2A;--accent2:#1D6B5A;--danger:#C0392B;--success:#1D6B5A;
+  --font:'DM Sans',sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
+h1,h2,h3{font-family:'DM Serif Display',serif}
+nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
+.nav-brand{font-family:'DM Serif Display',serif;font-size:1.25rem;color:var(--accent)}
+.nav-tabs{display:flex;gap:0.25rem}
+.nav-tab{background:none;border:none;padding:0.5rem 1rem;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:0.875rem;color:var(--muted);transition:all 0.15s}
+.nav-tab.active{background:#F7F5F0;color:var(--text);font-weight:500}
+.nav-tab:hover:not(.active){background:#f3f0eb}
+.view{display:none;padding:2rem;max-width:680px;margin:0 auto}
+.view.active{display:block}
+.view-wide{display:none;padding:2rem;max-width:960px;margin:0 auto}
+.view-wide.active{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.card-title{font-size:1.5rem;margin-bottom:0.25rem}
+.card-sub{color:var(--muted);font-size:0.875rem;margin-bottom:1.5rem}
+.field{margin-bottom:1rem}
+.field label{display:block;font-size:0.8rem;font-weight:500;color:var(--muted);margin-bottom:0.35rem;text-transform:uppercase;letter-spacing:0.04em}
+.field input,.field select,.field textarea{width:100%;padding:0.65rem 0.875rem;border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:0.9375rem;background:var(--card);color:var(--text);transition:border 0.15s;outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.error{color:var(--danger);font-size:0.8rem;margin-top:0.3rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.75rem 1.5rem;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:0.9375rem;font-weight:500;transition:all 0.15s;text-decoration:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#9e4e22}
+.btn-primary:disabled{background:#ccc;cursor:not-allowed}
+.btn-success{background:var(--accent2);color:#fff}
+.btn-success:hover{background:#155a49}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#a52820}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{background:var(--bg)}
+.btn-full{width:100%}
+.btn-sm{padding:0.45rem 0.875rem;font-size:0.8125rem}
+.qr-payment-block{background:linear-gradient(135deg,#fdf8f5,#fff8f2);border:1px solid #f0d8c8;border-radius:12px;padding:1.5rem;text-align:center;margin:1rem 0}
+.qr-img-wrap{width:200px;height:200px;margin:1rem auto;border:2px dashed #d4a882;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#fff;overflow:hidden}
+.qr-img-wrap img{width:100%;height:100%;object-fit:cover}
+.steps{display:flex;gap:0;margin-bottom:1.5rem;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.step{flex:1;padding:0.625rem;text-align:center;font-size:0.75rem;font-weight:500;color:var(--muted);background:var(--card);transition:all 0.2s}
+.step.active{background:var(--accent);color:#fff}
+.step.done{background:#f0faf7;color:var(--accent2)}
+.badge{display:inline-flex;align-items:center;gap:0.35rem;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.75rem;font-weight:500}
+.badge-pending{background:#fef9ec;color:#b45309;border:1px solid #fde68a}
+.badge-approved{background:#f0faf7;color:#1D6B5A;border:1px solid #a7f3d0}
+.badge-rejected{background:#fef2f2;color:#991b1b;border:1px solid #fca5a5}
+.badge-present{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:0.875rem}
+th{background:#f9f7f4;padding:0.625rem 0.875rem;text-align:left;font-weight:500;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--muted);border-bottom:1px solid var(--border)}
+td{padding:0.75rem 0.875rem;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf9}
+.alert{padding:0.875rem 1rem;border-radius:8px;font-size:0.875rem;margin-bottom:1rem;display:flex;align-items:flex-start;gap:0.5rem}
+.alert-success{background:#f0faf7;color:#1D6B5A;border:1px solid #a7f3d0}
+.alert-error{background:#fef2f2;color:#991b1b;border:1px solid #fca5a5}
+.alert-info{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+.alert-warning{background:#fef9ec;color:#b45309;border:1px solid #fde68a}
+.qr-result-box{text-align:center;padding:1rem}
+#qrcode-display,#qrcode-confirmation{display:flex;justify-content:center;margin:1rem auto}
+#qrcode-display canvas,#qrcode-display img,#qrcode-confirmation canvas,#qrcode-confirmation img{border:8px solid white;box-shadow:0 2px 16px rgba(0,0,0,0.1);border-radius:4px}
+.scanner-box{border:2px dashed var(--border);border-radius:12px;padding:2rem;text-align:center;background:#fafaf9}
+#scanner-video{width:100%;max-width:320px;border-radius:8px;margin:1rem auto;display:block}
+.scan-result{margin-top:1rem;padding:1rem;border-radius:8px;display:none;font-weight:500}
+.scan-ok{background:#f0faf7;border:1px solid #a7f3d0;color:#1D6B5A}
+.scan-warn{background:#fef9ec;border:1px solid #fde68a;color:#b45309}
+.scan-err{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}
+.upload-area{border:2px dashed var(--border);border-radius:8px;padding:2rem;text-align:center;cursor:pointer;transition:all 0.15s;background:#fafaf9}
+.upload-area:hover{border-color:var(--accent);background:#fdf9f7}
+.upload-area input[type=file]{display:none}
+.loader{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal-box{background:var(--card);border-radius:16px;padding:2rem;max-width:480px;width:100%;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:1.25rem;margin-bottom:0.5rem}
+.divider{border:none;border-top:1px solid var(--border);margin:1.25rem 0}
+.text-center{text-align:center}
+.text-muted{color:var(--muted);font-size:0.875rem}
+.mt-1{margin-top:0.5rem}.mt-2{margin-top:1rem}.mt-3{margin-top:1.5rem}
+.flex{display:flex}.gap-2{gap:0.5rem}.items-center{align-items:center}.justify-between{justify-content:space-between}
+.hidden{display:none!important}
+.admin-login{max-width:380px;margin:4rem auto}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:1.25rem}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center}
+.stat-num{font-size:1.75rem;font-weight:600;font-family:'DM Serif Display',serif}
+.stat-label{font-size:0.75rem;color:var(--muted);margin-top:0.15rem}
+.tab-bar{display:flex;gap:0.5rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.tab-btn{padding:0.5rem 1rem;border-radius:8px;border:1px solid var(--border);background:var(--card);font-family:var(--font);font-size:0.875rem;cursor:pointer;color:var(--muted);transition:all 0.15s}
+.tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.confirmation-box{background:linear-gradient(135deg,#f0faf7,#e8f5f0);border:1px solid #a7f3d0;border-radius:12px;padding:1.5rem;text-align:center;margin:1rem 0}
+.qr-pending-box{background:linear-gradient(135deg,#fef9ec,#fff8e8);border:1px solid #fde68a;border-radius:12px;padding:1.5rem;text-align:center;margin:1rem 0}
+/* EMAIL CONFIG */
+.cfg-section{border-top:1px solid var(--border);padding-top:1.25rem;margin-top:1.25rem}
+.cfg-section-title{font-size:0.9rem;font-weight:600;color:var(--text);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand" id="nav-brand">🎟 Evento</span>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('registro')">Registro</button>
+    <button class="nav-tab" onclick="showView('admin-login')">Admin</button>
+  </div>
+</nav>
+
+<!-- ============ REGISTRO PÚBLICO ============ -->
+<div id="view-registro" class="view active">
+  <div class="card">
+    <h1 class="card-title">Registro al evento</h1>
+    <p class="card-sub">Completa tu información y realiza el pago para obtener tu código de acceso.</p>
+
+    <div class="steps">
+      <div class="step active" id="step1-indicator">1 · Datos</div>
+      <div class="step" id="step2-indicator">2 · Pago</div>
+      <div class="step" id="step3-indicator">3 · Tu QR</div>
+    </div>
+
+    <!-- PASO 1 -->
+    <div id="paso1">
+      <div class="field-row">
+        <div class="field">
+          <label>Nombre</label>
+          <input type="text" id="reg-nombre" placeholder="Juan">
+        </div>
+        <div class="field">
+          <label>Apellido</label>
+          <input type="text" id="reg-apellido" placeholder="Pérez">
+        </div>
+      </div>
+      <div class="field">
+        <label>Correo electrónico</label>
+        <input type="email" id="reg-correo" placeholder="juan@correo.com">
+        <div class="error hidden" id="err-correo">Este correo ya está registrado.</div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Teléfono</label>
+          <input type="tel" id="reg-telefono" placeholder="+591 70000000">
+        </div>
+        <div class="field">
+          <label>CI / DNI</label>
+          <input type="text" id="reg-ci" placeholder="1234567">
+        </div>
+      </div>
+      <div class="field">
+        <label>Ciudad</label>
+        <select id="reg-ciudad">
+          <option value="">Selecciona tu ciudad</option>
+          <option>Cochabamba</option><option>La Paz</option><option>Santa Cruz</option>
+          <option>Oruro</option><option>Potosí</option><option>Sucre</option>
+          <option>Tarija</option><option>Beni</option><option>Pando</option><option>Otra</option>
+        </select>
+      </div>
+      <div class="alert alert-error hidden" id="err-form">Por favor completa todos los campos.</div>
+      <button class="btn btn-primary btn-full mt-2" onclick="irPaso2()">Continuar al pago →</button>
+    </div>
+
+    <!-- PASO 2 -->
+    <div id="paso2" class="hidden">
+      <div class="qr-payment-block">
+        <p style="font-size:0.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;font-weight:500">Escanea para pagar</p>
+        <div class="qr-img-wrap">
+          <div id="qr-pay-placeholder" style="color:var(--muted);font-size:0.8rem;text-align:center;padding:1rem">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d4a882" stroke-width="1.5" style="margin:0 auto 0.5rem;display:block"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3" rx="0.5"/><rect x="18" y="14" width="3" height="3" rx="0.5"/><rect x="14" y="18" width="3" height="3" rx="0.5"/><rect x="18" y="18" width="3" height="3" rx="0.5"/></svg>
+            <p style="font-size:0.75rem;color:#b08060">QR de pago configurado<br>por el administrador</p>
+          </div>
+          <img id="qr-pay-img" src="" alt="QR de pago" style="display:none;width:100%;height:100%;object-fit:cover">
+        </div>
+        <p style="font-size:1.1rem;font-weight:600;color:var(--accent)" id="monto-display">Bs. 100</p>
+        <p style="font-size:0.8rem;color:var(--muted);margin-top:0.25rem" id="banco-display">Cuenta de pago del evento</p>
+      </div>
+      <div class="field mt-2">
+        <label>Número de comprobante / referencia</label>
+        <input type="text" id="reg-comprobante" placeholder="Ej: TRX-20250605-001">
+      </div>
+      <div class="field">
+        <label>Captura del comprobante (opcional pero recomendado)</label>
+        <div class="upload-area" onclick="document.getElementById('reg-img').click()">
+          <input type="file" id="reg-img" accept="image/*" onchange="previewComprobante(event)">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#b08060" stroke-width="1.5" style="margin:0 auto 0.5rem;display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p style="font-size:0.8rem;color:var(--muted)">Click para subir imagen</p>
+          <p id="img-preview-name" style="font-size:0.75rem;color:var(--accent);margin-top:0.35rem"></p>
+        </div>
+      </div>
+      <div class="alert alert-info">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        El administrador verificará tu pago. Una vez aprobado, <strong>recibirás tu QR de acceso por correo</strong> y también podrás verlo en esta página con tu correo.
+      </div>
+      <div class="flex gap-2">
+        <button class="btn btn-outline" onclick="irPaso1()" style="flex:0 0 auto">← Volver</button>
+        <button class="btn btn-primary btn-full" onclick="enviarRegistro()" id="btn-enviar">Enviar registro</button>
+      </div>
+    </div>
+
+    <!-- PASO 3: Confirmación con QR (si aprobado) o espera (si pendiente) -->
+    <div id="paso3" class="hidden text-center">
+      <!-- Pendiente -->
+      <div id="paso3-pendiente">
+        <div class="qr-pending-box">
+          <div style="font-size:3rem;margin-bottom:0.75rem">⏳</div>
+          <h2 style="font-size:1.2rem;margin-bottom:0.5rem">¡Registro enviado!</h2>
+          <p class="text-muted">Tu pago está <strong>pendiente de verificación</strong>. Una vez que el administrador lo apruebe, recibirás tu QR de acceso en tu correo.</p>
+          <div id="reg-id-display" style="margin:1rem auto;padding:0.75rem;background:rgba(255,255,255,0.7);border-radius:8px;font-family:monospace;font-size:0.8rem;color:var(--muted);max-width:400px;word-break:break-all"></div>
+        </div>
+        <div style="margin-top:1rem">
+          <p class="text-muted" style="margin-bottom:0.75rem;font-size:0.875rem">¿Ya te aprobaron? Consulta tu QR con tu correo:</p>
+          <div class="flex gap-2" style="max-width:400px;margin:0 auto">
+            <input type="email" id="consulta-correo" placeholder="tu@correo.com" style="flex:1;padding:0.65rem 0.875rem;border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:0.9375rem">
+            <button class="btn btn-outline" onclick="consultarQR()">Ver QR</button>
+          </div>
+          <div id="consulta-result" class="hidden" style="margin-top:1rem"></div>
+        </div>
+      </div>
+
+      <!-- Aprobado: muestra QR -->
+      <div id="paso3-aprobado" class="hidden">
+        <div class="confirmation-box">
+          <div style="font-size:2.5rem;margin-bottom:0.5rem">✅</div>
+          <h2 style="font-size:1.2rem;margin-bottom:0.25rem">¡Pago verificado!</h2>
+          <p class="text-muted" style="margin-bottom:1rem">Este es tu código QR de acceso al evento. También lo recibirás por correo.</p>
+          <div id="qrcode-confirmation"></div>
+          <p style="font-size:0.75rem;color:var(--muted);margin-top:0.75rem" id="qr-code-text"></p>
+        </div>
+      </div>
+
+      <button class="btn btn-outline mt-2" onclick="resetForm()">Registrar otra persona</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADMIN LOGIN ============ -->
+<div id="view-admin-login" class="view">
+  <div class="admin-login">
+    <div class="card">
+      <h2 class="card-title" style="font-size:1.35rem">Acceso administrativo</h2>
+      <p class="card-sub">Solo para organizadores del evento.</p>
+      <div class="field">
+        <label>Contraseña admin</label>
+        <input type="password" id="admin-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginAdmin()">
+      </div>
+      <div class="alert alert-error hidden" id="err-login">Contraseña incorrecta.</div>
+      <button class="btn btn-primary btn-full" onclick="loginAdmin()">Ingresar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADMIN PANEL ============ -->
+<div id="view-admin" class="view-wide">
+  <div class="flex justify-between items-center" style="margin-bottom:1.25rem;flex-wrap:wrap;gap:0.75rem">
+    <h2 style="font-size:1.5rem">Panel de administración</h2>
+    <button class="btn btn-outline btn-sm" onclick="logoutAdmin()">← Salir</button>
+  </div>
+
+  <div class="stat-grid" id="admin-stats">
+    <div class="stat-card"><div class="stat-num" id="stat-total">—</div><div class="stat-label">Total registros</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-pend" style="color:#b45309">—</div><div class="stat-label">Pendientes</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-aprov" style="color:#1D6B5A">—</div><div class="stat-label">Aprobados</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-present" style="color:#1e40af">—</div><div class="stat-label">Presentes</div></div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showAdminTab('tab-registros', this)">📋 Registros</button>
+    <button class="tab-btn" onclick="showAdminTab('tab-scanner', this)">📷 Escáner QR</button>
+    <button class="tab-btn" onclick="showAdminTab('tab-config', this)">⚙ Configuración</button>
+  </div>
+
+  <!-- TAB REGISTROS -->
+  <div id="tab-registros">
+    <div class="card" style="padding:1rem">
+      <div class="flex justify-between items-center" style="margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem">
+        <h3 style="font-size:1rem">Listado de registros</h3>
+        <div class="flex gap-2">
+          <select id="filtro-estado" onchange="cargarRegistros()" style="padding:0.4rem 0.75rem;border:1px solid var(--border);border-radius:6px;font-family:var(--font);font-size:0.8rem">
+            <option value="">Todos</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="aprobado">Aprobados</option>
+            <option value="presente">Presentes</option>
+            <option value="rechazado">Rechazados</option>
+          </select>
+          <button class="btn btn-outline btn-sm" onclick="cargarRegistros()">↻ Actualizar</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th><th>Correo</th><th>CI</th><th>Ciudad</th><th>Comprobante</th><th>Estado</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-registros">
+            <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB SCANNER -->
+  <div id="tab-scanner" class="hidden">
+    <div class="card">
+      <h3 style="margin-bottom:0.5rem">Escáner QR — Día del evento</h3>
+      <p class="text-muted" style="margin-bottom:1.25rem;font-size:0.875rem">Solo personas con pago <strong>aprobado</strong> pueden ingresar.</p>
+      <div class="scanner-box">
+        <video id="scanner-video" autoplay playsinline muted style="display:none"></video>
+        <div id="scanner-idle">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#b08060" stroke-width="1.5" style="margin:0 auto 0.75rem;display:block"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
+          <p class="text-muted" style="margin-bottom:1rem">Activa la cámara para escanear QR</p>
+          <button class="btn btn-primary" onclick="startScanner()">Activar cámara</button>
+        </div>
+        <button class="btn btn-outline btn-sm hidden" id="btn-stop-scanner" style="margin-top:0.75rem" onclick="stopScanner()">■ Detener cámara</button>
+        <div class="scan-result" id="scan-result"></div>
+      </div>
+      <hr class="divider">
+      <p class="text-muted" style="font-size:0.875rem;margin-bottom:0.75rem">O ingresa el ID manualmente:</p>
+      <div class="flex gap-2">
+        <input type="text" id="manual-code" placeholder="ID del registro (UUID)" style="flex:1;padding:0.65rem 0.875rem;border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:0.9375rem">
+        <button class="btn btn-success" onclick="marcarPresente(document.getElementById('manual-code').value.trim())">Marcar presente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB CONFIG -->
+  <div id="tab-config" class="hidden">
+    <div class="card">
+      <h3 style="margin-bottom:1.25rem">Configuración del evento</h3>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Monto de inscripción (Bs.)</label>
+          <input type="number" id="cfg-monto" placeholder="100" value="100">
+        </div>
+        <div class="field">
+          <label>Nombre banco / titular</label>
+          <input type="text" id="cfg-banco" placeholder="Banco X — Nombre Titular">
+        </div>
+      </div>
+      <div class="field">
+        <label>Nombre del evento</label>
+        <input type="text" id="cfg-nombre-evento" placeholder="Gran Evento 2025">
+      </div>
+
+      <div class="field">
+        <label>Imagen QR de pago (tu QR bancario)</label>
+        <div class="upload-area" onclick="document.getElementById('cfg-qr-file').click()">
+          <input type="file" id="cfg-qr-file" accept="image/*" onchange="cargarQRPago(event)">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#b08060" stroke-width="1.5" style="margin:0 auto 0.5rem;display:block"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3"/></svg>
+          <p style="font-size:0.8rem;color:var(--muted)">Click para cargar la imagen de tu QR de pago bancario</p>
+        </div>
+        <div id="qr-pay-preview" style="margin-top:0.75rem;display:none;text-align:center">
+          <img id="qr-pay-thumb" src="" style="max-width:120px;border-radius:8px;border:2px solid var(--border)">
+          <p style="font-size:0.75rem;color:var(--accent);margin-top:0.35rem">✓ QR de pago cargado</p>
+        </div>
+      </div>
+
+      <!-- SECCIÓN EMAIL -->
+      <div class="cfg-section">
+        <p class="cfg-section-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+          Notificaciones por correo (Resend)
+        </p>
+        <div class="alert alert-info" style="font-size:0.8rem;margin-bottom:1rem">
+          Crea una cuenta gratuita en <strong>resend.com</strong>, copia tu API Key y pégala aquí. Con el plan gratuito puedes enviar 100 correos/día.
+        </div>
+        <div class="field">
+          <label>Resend API Key</label>
+          <input type="password" id="cfg-resend-key" placeholder="re_xxxxxxxxxxxxxxxxxxxx">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Correo remitente (de:)</label>
+            <input type="email" id="cfg-from-email" placeholder="evento@tudominio.com">
+          </div>
+          <div class="field">
+            <label>Nombre remitente</label>
+            <input type="text" id="cfg-from-name" placeholder="Equipo del Evento">
+          </div>
+        </div>
+        <div class="field">
+          <label>Mensaje personalizado del correo (opcional)</label>
+          <textarea id="cfg-email-msg" rows="3" placeholder="Ej: Gracias por tu registro. Presenta este QR en la entrada del evento el día X a las Y horas en Z lugar."></textarea>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="testEmail()">Enviar correo de prueba</button>
+        <div class="alert hidden mt-1" id="test-email-result"></div>
+      </div>
+
+      <div class="field cfg-section">
+        <label>Contraseña del panel admin</label>
+        <input type="text" id="cfg-password" placeholder="Contraseña admin" value="admin123">
+      </div>
+
+      <button class="btn btn-primary" onclick="guardarConfig()">💾 Guardar toda la configuración</button>
+      <div class="alert alert-success hidden mt-2" id="cfg-ok">✓ Configuración guardada correctamente</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay hidden" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <h3 class="modal-title" id="modal-nombre"></h3>
+    <p class="text-muted" id="modal-sub" style="margin-bottom:1rem"></p>
+    <div id="modal-body"></div>
+    <div class="flex gap-2 mt-3" id="modal-actions"></div>
+  </div>
+</div>
+
+<script>
+// ─── CONSTANTES ───────────────────────────────────────────────
+const SUPABASE_URL = 'https://ksjhmffcbsbilluspwvp.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_LheV41B97hnmP7_sDDKoYQ_2maPPBv0';
+
+// ─── CONFIG ───────────────────────────────────────────────────
+let CONFIG = {
+  monto: 100,
+  banco: 'Cuenta de pago del evento',
+  nombreEvento: 'Evento',
+  qrPayImg: '',
+  password: 'admin123',
+  resendKey: '',
+  fromEmail: '',
+  fromName: 'Equipo del Evento',
+  emailMsg: ''
+};
+
+function loadConfig() {
+  try {
+    const s = localStorage.getItem('evento_cfg');
+    if (s) CONFIG = { ...CONFIG, ...JSON.parse(s) };
+  } catch(e) {}
+  applyConfig();
+}
+
+function applyConfig() {
+  const set = (id, val) => { const el = document.getElementById(id); if(el && val) el.value = val; };
+  const setText = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+
+  setText('monto-display', `Bs. ${CONFIG.monto}`);
+  setText('banco-display', CONFIG.banco);
+  setText('nav-brand', `🎟 ${CONFIG.nombreEvento || 'Evento'}`);
+
+  set('cfg-monto', CONFIG.monto);
+  set('cfg-banco', CONFIG.banco);
+  set('cfg-nombre-evento', CONFIG.nombreEvento);
+  set('cfg-password', CONFIG.password);
+  set('cfg-resend-key', CONFIG.resendKey);
+  set('cfg-from-email', CONFIG.fromEmail);
+  set('cfg-from-name', CONFIG.fromName);
+  set('cfg-email-msg', CONFIG.emailMsg);
+
+  if (CONFIG.qrPayImg) {
+    const img = document.getElementById('qr-pay-img');
+    const ph = document.getElementById('qr-pay-placeholder');
+    if (img && ph) { img.src = CONFIG.qrPayImg; img.style.display = 'block'; ph.style.display = 'none'; }
+    const thumb = document.getElementById('qr-pay-thumb');
+    const prev = document.getElementById('qr-pay-preview');
+    if (thumb && prev) { thumb.src = CONFIG.qrPayImg; prev.style.display = 'block'; }
+  }
+}
+
+function guardarConfig() {
+  CONFIG.monto = document.getElementById('cfg-monto').value || 100;
+  CONFIG.banco = document.getElementById('cfg-banco').value || '';
+  CONFIG.nombreEvento = document.getElementById('cfg-nombre-evento').value || 'Evento';
+  CONFIG.password = document.getElementById('cfg-password').value || 'admin123';
+  CONFIG.resendKey = document.getElementById('cfg-resend-key').value || '';
+  CONFIG.fromEmail = document.getElementById('cfg-from-email').value || '';
+  CONFIG.fromName = document.getElementById('cfg-from-name').value || 'Equipo del Evento';
+  CONFIG.emailMsg = document.getElementById('cfg-email-msg').value || '';
+  localStorage.setItem('evento_cfg', JSON.stringify(CONFIG));
+  applyConfig();
+  const ok = document.getElementById('cfg-ok');
+  ok.classList.remove('hidden');
+  setTimeout(() => ok.classList.add('hidden'), 2500);
+}
+
+function cargarQRPago(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    CONFIG.qrPayImg = ev.target.result;
+    localStorage.setItem('evento_cfg', JSON.stringify(CONFIG));
+    applyConfig();
+  };
+  reader.readAsDataURL(file);
+}
+
+// ─── EMAIL VIA RESEND ─────────────────────────────────────────
+async function enviarEmailAprobacion(registro) {
+  if (!CONFIG.resendKey || !CONFIG.fromEmail) return false;
+
+  const qrUrl = `${window.location.origin}${window.location.pathname}?qr=${registro.id}`;
+  const msgExtra = CONFIG.emailMsg ? `<p style="color:#4b5563;margin-bottom:1rem">${CONFIG.emailMsg}</p>` : '';
+
+  const html = `
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;font-family:'Helvetica Neue',Arial,sans-serif;background:#F7F5F0">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F7F5F0;padding:40px 20px">
+  <tr><td align="center">
+    <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e5e1d8">
+      <tr>
+        <td style="background:#B85C2A;padding:28px 32px">
+          <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:600">🎟 ${CONFIG.nombreEvento || 'Tu Evento'}</h1>
+          <p style="margin:6px 0 0;color:rgba(255,255,255,0.85);font-size:14px">Confirmación de registro</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px">
+          <h2 style="margin:0 0 8px;font-size:20px;color:#1a1a1a">¡Tu pago fue verificado! ✅</h2>
+          <p style="color:#6b7280;margin:0 0 20px;font-size:15px">Hola <strong>${registro.nombre}</strong>, tu inscripción al evento ha sido aprobada.</p>
+          ${msgExtra}
+          <div style="background:#f0faf7;border:1px solid #a7f3d0;border-radius:10px;padding:20px;text-align:center;margin-bottom:24px">
+            <p style="margin:0 0 12px;font-size:13px;color:#1D6B5A;font-weight:600;text-transform:uppercase;letter-spacing:0.05em">Tu código QR de acceso</p>
+            <p style="margin:0 0 12px;font-size:12px;color:#4b5563">Presenta este código en la entrada del evento.</p>
+            <div style="background:#fff;border-radius:8px;padding:16px;display:inline-block;border:1px solid #e5e1d8">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(registro.id)}&color=1a1a1a&bgcolor=ffffff" width="180" height="180" alt="QR de acceso" style="display:block">
+            </div>
+            <p style="margin:12px 0 0;font-size:11px;color:#9ca3af;font-family:monospace">ID: ${registro.id}</p>
+          </div>
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9f7f4;border-radius:8px;padding:16px;border:1px solid #e5e1d8;margin-bottom:24px">
+            <tr><td style="font-size:13px;color:#6b7280;padding:4px 0">Nombre</td><td style="font-size:13px;font-weight:500;color:#1a1a1a;text-align:right;padding:4px 0">${registro.nombre}</td></tr>
+            <tr><td style="font-size:13px;color:#6b7280;padding:4px 0">Correo</td><td style="font-size:13px;color:#1a1a1a;text-align:right;padding:4px 0">${registro.correo}</td></tr>
+            <tr><td style="font-size:13px;color:#6b7280;padding:4px 0">Ciudad</td><td style="font-size:13px;color:#1a1a1a;text-align:right;padding:4px 0">${registro.ciudad}</td></tr>
+          </table>
+          <p style="font-size:12px;color:#9ca3af;text-align:center;margin:0">
+            Si tienes alguna consulta, responde a este correo.<br>
+            ${CONFIG.nombreEvento || 'Tu Evento'} — Equipo organizador
+          </p>
+        </td>
+      </tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>`;
+
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${CONFIG.resendKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: `${CONFIG.fromName} <${CONFIG.fromEmail}>`,
+        to: [registro.correo],
+        subject: `✅ ¡Tu registro fue aprobado! — ${CONFIG.nombreEvento || 'Evento'}`,
+        html
+      })
+    });
+    return res.ok;
+  } catch(e) {
+    console.error('Error enviando email:', e);
+    return false;
+  }
+}
+
+async function testEmail() {
+  if (!CONFIG.resendKey || !CONFIG.fromEmail) {
+    const el = document.getElementById('test-email-result');
+    el.className = 'alert alert-error mt-1';
+    el.textContent = 'Completa el API Key y el correo remitente primero.';
+    el.classList.remove('hidden');
+    return;
+  }
+  const el = document.getElementById('test-email-result');
+  el.className = 'alert alert-info mt-1';
+  el.textContent = 'Enviando correo de prueba...';
+  el.classList.remove('hidden');
+  const ok = await enviarEmailAprobacion({
+    id: 'test-id-000',
+    nombre: 'Usuario de Prueba',
+    correo: CONFIG.fromEmail,
+    ciudad: 'Cochabamba'
+  });
+  if (ok) {
+    el.className = 'alert alert-success mt-1';
+    el.textContent = `✓ Correo de prueba enviado a ${CONFIG.fromEmail}`;
+  } else {
+    el.className = 'alert alert-error mt-1';
+    el.textContent = 'Error al enviar. Verifica tu API Key de Resend.';
+  }
+}
+
+// ─── SUPABASE ─────────────────────────────────────────────────
+async function sb(path, opts = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation',
+      ...opts.headers
+    },
+    ...opts
+  });
+  if (!res.ok) { const e = await res.text(); throw new Error(e); }
+  const txt = await res.text();
+  return txt ? JSON.parse(txt) : null;
+}
+
+// ─── VISTAS ───────────────────────────────────────────────────
+let adminLoggedIn = false;
+
+function showView(v) {
+  document.querySelectorAll('.view, .view-wide').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  if (v === 'admin') {
+    document.getElementById('view-admin').classList.add('active');
+    cargarRegistros();
+    actualizarStats();
+  } else if (v === 'admin-login') {
+    document.getElementById('view-admin-login').classList.add('active');
+    document.querySelectorAll('.nav-tab')[1].classList.add('active');
+  } else {
+    document.getElementById('view-registro').classList.add('active');
+    document.querySelectorAll('.nav-tab')[0].classList.add('active');
+    // Verificar parámetro URL ?qr=
+    const params = new URLSearchParams(window.location.search);
+    const qrId = params.get('qr');
+    if (qrId) consultarPorId(qrId);
+  }
+}
+
+function showAdminTab(tabId, btn) {
+  ['tab-registros','tab-scanner','tab-config'].forEach(id => {
+    document.getElementById(id).classList.add('hidden');
+  });
+  document.getElementById(tabId).classList.remove('hidden');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (tabId === 'tab-registros') cargarRegistros();
+}
+
+function loginAdmin() {
+  const pass = document.getElementById('admin-pass').value;
+  if (pass === CONFIG.password) {
+    adminLoggedIn = true;
+    document.getElementById('err-login').classList.add('hidden');
+    showView('admin');
+  } else {
+    document.getElementById('err-login').classList.remove('hidden');
+  }
+}
+function logoutAdmin() {
+  adminLoggedIn = false;
+  showView('registro');
+}
+
+// ─── REGISTRO STEPS ───────────────────────────────────────────
+let uploadedImgB64 = '';
+
+function irPaso2() {
+  const nombre = document.getElementById('reg-nombre').value.trim();
+  const apellido = document.getElementById('reg-apellido').value.trim();
+  const correo = document.getElementById('reg-correo').value.trim();
+  const telefono = document.getElementById('reg-telefono').value.trim();
+  const ci = document.getElementById('reg-ci').value.trim();
+  const ciudad = document.getElementById('reg-ciudad').value;
+  const errForm = document.getElementById('err-form');
+  const errCorreo = document.getElementById('err-correo');
+  errCorreo.classList.add('hidden');
+  if (!nombre || !apellido || !correo || !telefono || !ci || !ciudad) {
+    errForm.textContent = 'Por favor completa todos los campos.';
+    errForm.classList.remove('hidden'); return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+    errForm.textContent = 'Ingresa un correo válido.';
+    errForm.classList.remove('hidden'); return;
+  }
+  errForm.classList.add('hidden');
+  document.getElementById('paso1').classList.add('hidden');
+  document.getElementById('paso2').classList.remove('hidden');
+  document.getElementById('step1-indicator').classList.remove('active');
+  document.getElementById('step1-indicator').classList.add('done');
+  document.getElementById('step2-indicator').classList.add('active');
+}
+
+function irPaso1() {
+  document.getElementById('paso2').classList.add('hidden');
+  document.getElementById('paso1').classList.remove('hidden');
+  document.getElementById('step2-indicator').classList.remove('active');
+  document.getElementById('step1-indicator').classList.remove('done');
+  document.getElementById('step1-indicator').classList.add('active');
+}
+
+function previewComprobante(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  document.getElementById('img-preview-name').textContent = '✓ ' + file.name;
+  const reader = new FileReader();
+  reader.onload = ev => { uploadedImgB64 = ev.target.result; };
+  reader.readAsDataURL(file);
+}
+
+async function enviarRegistro() {
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span> Enviando...';
+
+  const nombre = document.getElementById('reg-nombre').value.trim();
+  const apellido = document.getElementById('reg-apellido').value.trim();
+  const correo = document.getElementById('reg-correo').value.trim();
+  const telefono = document.getElementById('reg-telefono').value.trim();
+  const ci = document.getElementById('reg-ci').value.trim();
+  const ciudad = document.getElementById('reg-ciudad').value;
+  const comprobante = document.getElementById('reg-comprobante').value.trim();
+
+  try {
+    const existing = await sb(`registros?correo=eq.${encodeURIComponent(correo)}&select=id`);
+    if (existing && existing.length > 0) {
+      document.getElementById('err-correo').classList.remove('hidden');
+      irPaso1();
+      btn.disabled = false;
+      btn.innerHTML = 'Enviar registro';
+      return;
+    }
+
+    const res = await sb('registros', {
+      method: 'POST',
+      body: JSON.stringify({
+        nombre: nombre + ' ' + apellido,
+        correo,
+        telefono,
+        ci_dni: ci,
+        ciudad,
+        comprobante_ref: comprobante,
+        comprobante_img: uploadedImgB64 || null,
+        estado: 'pendiente'
+      }),
+      prefer: 'return=representation'
+    });
+
+    const reg = res[0];
+    // Mostrar paso 3 pendiente
+    document.getElementById('paso2').classList.add('hidden');
+    document.getElementById('paso3').classList.remove('hidden');
+    document.getElementById('paso3-pendiente').classList.remove('hidden');
+    document.getElementById('paso3-aprobado').classList.add('hidden');
+    document.getElementById('step2-indicator').classList.remove('active');
+    document.getElementById('step2-indicator').classList.add('done');
+    document.getElementById('step3-indicator').classList.add('active');
+    document.getElementById('reg-id-display').textContent = `ID de registro: ${reg.id}`;
+    document.getElementById('consulta-correo').value = correo;
+  } catch(e) {
+    alert('Error al registrar: ' + e.message);
+    btn.disabled = false;
+    btn.innerHTML = 'Enviar registro';
+  }
+}
+
+async function consultarQR() {
+  const correo = document.getElementById('consulta-correo').value.trim();
+  if (!correo) return;
+  const res = document.getElementById('consulta-result');
+  res.className = 'alert alert-info';
+  res.textContent = 'Consultando...';
+  res.classList.remove('hidden');
+  try {
+    const data = await sb(`registros?correo=eq.${encodeURIComponent(correo)}&select=*`);
+    if (!data || data.length === 0) {
+      res.className = 'alert alert-error'; res.textContent = 'No se encontró registro con ese correo.'; return;
+    }
+    const reg = data[0];
+    if (reg.estado === 'pendiente') {
+      res.className = 'alert alert-warning'; res.textContent = '⏳ Tu pago aún está pendiente de verificación.'; return;
+    }
+    if (reg.estado === 'rechazado') {
+      res.className = 'alert alert-error'; res.textContent = '❌ Tu registro fue rechazado. Contacta al organizador.'; return;
+    }
+    if (reg.estado === 'aprobado' || reg.estado === 'presente') {
+      res.classList.add('hidden');
+      mostrarQRAprobado(reg.id);
+    }
+  } catch(e) {
+    res.className = 'alert alert-error'; res.textContent = 'Error: ' + e.message;
+  }
+}
+
+async function consultarPorId(id) {
+  try {
+    const data = await sb(`registros?id=eq.${id}&select=*`);
+    if (data && data.length > 0 && (data[0].estado === 'aprobado' || data[0].estado === 'presente')) {
+      // Ir al paso 3 aprobado
+      document.getElementById('paso1').classList.add('hidden');
+      document.getElementById('paso3').classList.remove('hidden');
+      document.getElementById('paso3-pendiente').classList.add('hidden');
+      document.getElementById('paso3-aprobado').classList.remove('hidden');
+      document.getElementById('step1-indicator').classList.remove('active');
+      document.getElementById('step1-indicator').classList.add('done');
+      document.getElementById('step2-indicator').classList.add('done');
+      document.getElementById('step3-indicator').classList.add('active');
+      mostrarQRAprobado(id);
+    }
+  } catch(e) {}
+}
+
+function mostrarQRAprobado(id) {
+  document.getElementById('paso3-pendiente').classList.add('hidden');
+  document.getElementById('paso3-aprobado').classList.remove('hidden');
+  document.getElementById('qr-code-text').textContent = `ID: ${id}`;
+  const container = document.getElementById('qrcode-confirmation');
+  container.innerHTML = '';
+  setTimeout(() => {
+    new QRCode(container, {
+      text: id,
+      width: 200, height: 200,
+      colorDark: '#1a1a1a', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }, 100);
+}
+
+function resetForm() {
+  ['reg-nombre','reg-apellido','reg-correo','reg-telefono','reg-ci','reg-comprobante'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('reg-ciudad').value = '';
+  document.getElementById('paso3').classList.add('hidden');
+  document.getElementById('paso1').classList.remove('hidden');
+  document.getElementById('paso2').classList.add('hidden');
+  ['step1-indicator','step2-indicator','step3-indicator'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('active','done');
+  });
+  document.getElementById('step1-indicator').classList.add('active');
+  document.getElementById('err-correo').classList.add('hidden');
+  uploadedImgB64 = '';
+}
+
+// ─── ADMIN REGISTROS ──────────────────────────────────────────
+async function cargarRegistros() {
+  const tbody = document.getElementById('tabla-registros');
+  const filtro = document.getElementById('filtro-estado').value;
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--muted)">Cargando...</td></tr>';
+  try {
+    let path = 'registros?select=*&order=created_at.desc';
+    if (filtro) path += `&estado=eq.${filtro}`;
+    const data = await sb(path);
+    actualizarStatsData(data);
+    if (!data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">Sin registros.</td></tr>'; return;
+    }
+    tbody.innerHTML = data.map(r => `
+      <tr>
+        <td style="font-weight:500">${r.nombre}</td>
+        <td style="font-size:0.8rem;color:var(--muted)">${r.correo}</td>
+        <td style="font-size:0.8rem">${r.ci_dni}</td>
+        <td style="font-size:0.8rem">${r.ciudad}</td>
+        <td style="font-size:0.75rem;color:var(--muted)">${r.comprobante_ref || '—'}${r.comprobante_img ? ' <a href="#" onclick="verImgComprobante(event,\''+r.id+'\')">📎 ver</a>' : ''}</td>
+        <td>${badgeEstado(r.estado)}</td>
+        <td>
+          <div class="flex gap-2" style="flex-wrap:wrap">
+            ${r.estado === 'pendiente' ? `
+              <button class="btn btn-success btn-sm" onclick="aprobarRegistro('${r.id}','${r.nombre}','${r.correo}','${r.ciudad}')">✓ Aprobar</button>
+              <button class="btn btn-danger btn-sm" onclick="rechazarRegistro('${r.id}')">✗</button>
+            ` : ''}
+            ${r.estado === 'aprobado' ? `
+              <button class="btn btn-outline btn-sm" onclick="verQRAdmin('${r.id}','${r.nombre}')">Ver QR</button>
+            ` : ''}
+            ${r.estado === 'presente' ? `<span style="font-size:0.75rem;color:#1e40af;font-weight:500">✓ Presente</span>` : ''}
+            ${r.estado === 'rechazado' ? `<span style="font-size:0.75rem;color:#991b1b">Rechazado</span>` : ''}
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--danger)">Error: ${e.message}</td></tr>`;
+  }
+}
+
+function badgeEstado(e) {
+  const map = {
+    pendiente: ['badge-pending','⏳ Pendiente'],
+    aprobado: ['badge-approved','✓ Aprobado'],
+    rechazado: ['badge-rejected','✗ Rechazado'],
+    presente: ['badge-present','✓ Presente']
+  };
+  const [cls, label] = map[e] || ['badge-pending', e];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+async function actualizarStats() {
+  try {
+    const data = await sb('registros?select=estado');
+    actualizarStatsData(data);
+  } catch(e) {}
+}
+
+function actualizarStatsData(data) {
+  if (!data) return;
+  document.getElementById('stat-total').textContent = data.length;
+  document.getElementById('stat-pend').textContent = data.filter(r => r.estado === 'pendiente').length;
+  document.getElementById('stat-aprov').textContent = data.filter(r => r.estado === 'aprobado').length;
+  document.getElementById('stat-present').textContent = data.filter(r => r.estado === 'presente').length;
+}
+
+async function aprobarRegistro(id, nombre, correo, ciudad) {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = '...';
+  try {
+    await sb(`registros?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ estado: 'aprobado', qr_code: id }),
+      prefer: 'return=minimal'
+    });
+    // Enviar correo
+    const emailOk = await enviarEmailAprobacion({ id, nombre, correo, ciudad });
+    if (emailOk) {
+      showToast(`✓ ${nombre} aprobado. Correo enviado a ${correo}`);
+    } else {
+      showToast(`✓ ${nombre} aprobado. (Correo no configurado o error al enviar)`, true);
+    }
+    cargarRegistros();
+  } catch(e) {
+    alert('Error: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = '✓ Aprobar';
+  }
+}
+
+async function rechazarRegistro(id) {
+  if (!confirm('¿Rechazar este registro?')) return;
+  try {
+    await sb(`registros?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ estado: 'rechazado' }),
+      prefer: 'return=minimal'
+    });
+    cargarRegistros();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+function verQRAdmin(id, nombre) {
+  document.getElementById('modal-nombre').textContent = nombre;
+  document.getElementById('modal-sub').textContent = 'QR de acceso al evento';
+  const body = document.getElementById('modal-body');
+  body.innerHTML = '<div class="qr-result-box"><div id="qrcode-display"></div><p class="text-muted" style="margin-top:0.75rem;font-size:0.8rem;word-break:break-all">ID: ' + id + '</p></div>';
+  document.getElementById('modal-actions').innerHTML = `<button class="btn btn-outline btn-full" onclick="closeModal()">Cerrar</button>`;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  setTimeout(() => {
+    document.getElementById('qrcode-display').innerHTML = '';
+    new QRCode(document.getElementById('qrcode-display'), {
+      text: id, width: 200, height: 200,
+      colorDark: '#1a1a1a', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }, 100);
+}
+
+function verImgComprobante(e, id) {
+  e.preventDefault();
+  sb(`registros?id=eq.${id}&select=comprobante_img,nombre`).then(data => {
+    if (!data || !data[0] || !data[0].comprobante_img) return;
+    document.getElementById('modal-nombre').textContent = data[0].nombre;
+    document.getElementById('modal-sub').textContent = 'Comprobante de pago';
+    document.getElementById('modal-body').innerHTML = `<img src="${data[0].comprobante_img}" style="width:100%;border-radius:8px;border:1px solid var(--border)">`;
+    document.getElementById('modal-actions').innerHTML = `<button class="btn btn-outline btn-full" onclick="closeModal()">Cerrar</button>`;
+    document.getElementById('modal-overlay').classList.remove('hidden');
+  });
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+}
+
+// ─── TOAST ────────────────────────────────────────────────────
+function showToast(msg, warn = false) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:0.875rem 1.25rem;border-radius:10px;font-size:0.875rem;font-weight:500;z-index:999;max-width:420px;text-align:center;transition:opacity 0.3s';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.background = warn ? '#fef9ec' : '#f0faf7';
+  t.style.color = warn ? '#b45309' : '#1D6B5A';
+  t.style.border = warn ? '1px solid #fde68a' : '1px solid #a7f3d0';
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 3500);
+}
+
+// ─── SCANNER ──────────────────────────────────────────────────
+let scannerStream = null, scanInterval = null;
+
+async function startScanner() {
+  try {
+    scannerStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    const video = document.getElementById('scanner-video');
+    video.srcObject = scannerStream;
+    video.style.display = 'block';
+    document.getElementById('scanner-idle').style.display = 'none';
+    document.getElementById('btn-stop-scanner').classList.remove('hidden');
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    scanInterval = setInterval(() => {
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0);
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imgData.data, imgData.width, imgData.height);
+        if (code) { stopScanner(); marcarPresente(code.data); }
+      }
+    }, 200);
+  } catch(e) { alert('No se pudo acceder a la cámara: ' + e.message); }
+}
+
+function stopScanner() {
+  if (scannerStream) { scannerStream.getTracks().forEach(t => t.stop()); scannerStream = null; }
+  if (scanInterval) { clearInterval(scanInterval); scanInterval = null; }
+  document.getElementById('scanner-video').style.display = 'none';
+  document.getElementById('scanner-idle').style.display = 'block';
+  document.getElementById('btn-stop-scanner').classList.add('hidden');
+}
+
+async function marcarPresente(codigo) {
+  if (!codigo) return;
+  const result = document.getElementById('scan-result');
+  result.style.display = 'block';
+  result.className = 'scan-result';
+  result.innerHTML = '⏳ Verificando...';
+  result.style.background = '#eff6ff';
+  result.style.border = '1px solid #bfdbfe';
+  result.style.color = '#1e40af';
+  try {
+    const data = await sb(`registros?id=eq.${codigo.trim()}&select=*`);
+    if (!data || data.length === 0) {
+      result.className = 'scan-result scan-err';
+      result.style.cssText = 'display:block';
+      result.innerHTML = '❌ QR no encontrado en el sistema.';
+      return;
+    }
+    const reg = data[0];
+    if (reg.estado === 'presente') {
+      result.className = 'scan-result scan-warn';
+      result.style.cssText = 'display:block';
+      result.innerHTML = `⚠️ <strong>${reg.nombre}</strong> ya fue registrado como presente anteriormente.`;
+      return;
+    }
+    if (reg.estado === 'pendiente') {
+      result.className = 'scan-result scan-err';
+      result.style.cssText = 'display:block';
+      result.innerHTML = `🔴 <strong>${reg.nombre}</strong><br>PAGO NO VERIFICADO — No puede ingresar.<br><small style="font-size:0.8rem;opacity:0.85">El administrador debe aprobar el pago primero.</small>`;
+      return;
+    }
+    if (reg.estado === 'rechazado') {
+      result.className = 'scan-result scan-err';
+      result.style.cssText = 'display:block';
+      result.innerHTML = `🚫 <strong>${reg.nombre}</strong> — Registro rechazado. No puede ingresar.`;
+      return;
+    }
+    // aprobado → marcar presente
+    await sb(`registros?id=eq.${codigo.trim()}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ estado: 'presente' }),
+      prefer: 'return=minimal'
+    });
+    result.className = 'scan-result scan-ok';
+    result.style.cssText = 'display:block';
+    result.innerHTML = `✅ <strong>${reg.nombre}</strong> (${reg.ciudad})<br>¡Ingreso registrado correctamente!`;
+    document.getElementById('manual-code').value = '';
+    actualizarStats();
+  } catch(e) {
+    result.className = 'scan-result scan-err';
+    result.style.cssText = 'display:block';
+    result.innerHTML = '❌ Error: ' + e.message;
+  }
+}
+
+// ─── INIT ─────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  loadConfig();
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('qr')) consultarPorId(params.get('qr'));
+});
+</script>
+</body>
+</html>
