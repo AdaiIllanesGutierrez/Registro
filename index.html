@@ -196,7 +196,7 @@ tr:hover td{background:#fafaf9}
           </div>
         </div>
         <div class="alert alert-info" style="font-size:0.85rem">
-          El admin verificará tu pago. Una vez aprobado, <strong>recibirás tu QR por correo</strong> y también podrás verlo aquí en "Ya me registré".
+          El admin verificará tu pago. Una vez aprobado, podrás ver tu QR aquí en la pestaña "Ya me registré".
         </div>
         <div class="flex gap-2">
           <button class="btn btn-outline" onclick="irPaso1()" style="flex:0 0 auto">← Volver</button>
@@ -210,7 +210,7 @@ tr:hover td{background:#fafaf9}
           <div class="pending-box">
             <div style="font-size:2.75rem;margin-bottom:0.5rem">⏳</div>
             <h2 style="font-size:1.15rem;margin-bottom:0.4rem">¡Registro enviado!</h2>
-            <p class="text-muted" style="font-size:0.875rem">Tu pago está pendiente de verificación. Cuando sea aprobado recibirás tu QR por correo. También puedes consultarlo abajo.</p>
+            <p class="text-muted" style="font-size:0.875rem">Tu pago está pendiente de verificación. Cuando sea aprobado podrás ver tu QR consultando con tu correo abajo.</p>
           </div>
           <div class="qr-lookup-box">
             <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.65rem">Consulta el estado de tu registro con tu correo:</p>
@@ -353,20 +353,7 @@ tr:hover td{background:#fafaf9}
         </div>
       </div>
 
-      <div class="cfg-section">
-        <p class="cfg-label">📧 Notificaciones por correo (Resend)</p>
-        <div class="alert alert-info" style="font-size:0.8rem;margin-bottom:0.875rem">
-          Ve a <strong>resend.com</strong>, crea una cuenta gratis y pega tu API Key. Puedes enviar desde <code>onboarding@resend.dev</code> sin dominio propio (100 emails/día gratis).
-        </div>
-        <div class="field"><label>Resend API Key</label><input type="password" id="cfg-resend-key" placeholder="re_xxxxxxxxxxxx"></div>
-        <div class="field-row">
-          <div class="field"><label>Correo remitente</label><input type="email" id="cfg-from-email" placeholder="onboarding@resend.dev"></div>
-          <div class="field"><label>Nombre remitente</label><input type="text" id="cfg-from-name" placeholder="Equipo del Evento"></div>
-        </div>
-        <div class="field"><label>Mensaje extra en el correo (opcional)</label><textarea id="cfg-email-msg" rows="2" placeholder="Presenta este QR en la entrada. El evento es el..."></textarea></div>
-        <button class="btn btn-outline btn-sm" onclick="testEmail()">Enviar correo de prueba</button>
-        <div id="test-email-res" class="hidden" style="margin-top:0.65rem;font-size:0.85rem;padding:0.65rem 0.875rem;border-radius:8px"></div>
-      </div>
+
 
       <div class="cfg-section">
         <div class="field"><label>Contraseña del panel admin</label><input type="text" id="cfg-password" value="admin123"></div>
@@ -392,14 +379,11 @@ tr:hover td{background:#fafaf9}
 // ─── CONFIG ───────────────────────────────────────────
 const SUPABASE_URL = 'https://ksjhmffcbsbilluspwvp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_LheV41B97hnmP7_sDDKoYQ_2maPPBv0';
-// La API key de Resend vive en la Edge Function de Supabase (seguro, sin exponer en el browser)
+
 
 let CONFIG = {
   monto: 100, banco: '', nombreEvento: 'Evento',
-  qrPayImg: '', password: 'admin123',
-  resendKey: '',
-  fromEmail: 'onboarding@resend.dev',
-  fromName: 'Equipo del Evento', emailMsg: ''
+  qrPayImg: '', password: 'admin123'
 };
 
 function loadConfig() {
@@ -414,8 +398,6 @@ function applyConfig() {
   $t('nav-brand', `🎟 ${CONFIG.nombreEvento||'Evento'}`);
   $v('cfg-nombre',CONFIG.nombreEvento); $v('cfg-monto',CONFIG.monto);
   $v('cfg-banco',CONFIG.banco); $v('cfg-password',CONFIG.password);
-  $v('cfg-resend-key',CONFIG.resendKey); $v('cfg-from-email',CONFIG.fromEmail);
-  $v('cfg-from-name',CONFIG.fromName); $v('cfg-email-msg',CONFIG.emailMsg);
   if (CONFIG.qrPayImg) {
     const img=document.getElementById('qr-pay-img'), ph=document.getElementById('qr-pay-ph');
     if(img&&ph){img.src=CONFIG.qrPayImg;img.style.display='block';ph.style.display='none';}
@@ -428,10 +410,6 @@ function guardarConfig() {
   CONFIG.monto        = document.getElementById('cfg-monto').value||100;
   CONFIG.banco        = document.getElementById('cfg-banco').value||'';
   CONFIG.password     = document.getElementById('cfg-password').value||'admin123';
-  CONFIG.resendKey    = document.getElementById('cfg-resend-key').value||RESEND_KEY;
-  CONFIG.fromEmail    = document.getElementById('cfg-from-email').value||'onboarding@resend.dev';
-  CONFIG.fromName     = document.getElementById('cfg-from-name').value||'Equipo del Evento';
-  CONFIG.emailMsg     = document.getElementById('cfg-email-msg').value||'';
   localStorage.setItem('evt_cfg', JSON.stringify(CONFIG));
   applyConfig();
   const ok=document.getElementById('cfg-ok'); ok.classList.remove('hidden');
@@ -459,100 +437,7 @@ async function sb(path, opts={}) {
   const t=await res.text(); return t?JSON.parse(t):null;
 }
 
-// ─── EMAIL via Resend (fetch directo, sin SDK) ─────────
-async function enviarEmailAprobacion(reg) {
-  const from = CONFIG.fromEmail || 'onboarding@resend.dev';
-  const fromName = CONFIG.fromName || 'Equipo del Evento';
-  const evento = CONFIG.nombreEvento || 'Evento';
-  const extra = CONFIG.emailMsg ? `<p style="color:#374151;margin:0 0 16px">${CONFIG.emailMsg}</p>` : '';
-
-  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;font-family:Arial,sans-serif;background:#F7F5F0">
-<table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px">
-<tr><td align="center">
-<table width="540" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;border:1px solid #e5e1d8;overflow:hidden">
-<tr><td style="background:#B85C2A;padding:24px 28px">
-  <h1 style="margin:0;color:#fff;font-size:20px">🎟 ${evento}</h1>
-  <p style="margin:4px 0 0;color:rgba(255,255,255,0.85);font-size:13px">Confirmación de registro</p>
-</td></tr>
-<tr><td style="padding:28px">
-  <h2 style="margin:0 0 8px;font-size:18px;color:#1a1a1a">¡Tu pago fue verificado! ✅</h2>
-  <p style="color:#6b7280;margin:0 0 18px;font-size:14px">Hola <strong>${reg.nombre}</strong>, tu inscripción fue aprobada.</p>
-  ${extra}
-  <div style="background:#f0faf7;border:1px solid #a7f3d0;border-radius:10px;padding:18px;text-align:center;margin-bottom:20px">
-    <p style="margin:0 0 10px;font-size:12px;color:#1D6B5A;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Tu QR de acceso</p>
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(reg.id)}" width="160" height="160" style="display:block;margin:0 auto;border:6px solid #fff;border-radius:4px" alt="QR">
-    <p style="margin:10px 0 0;font-size:11px;color:#9ca3af;font-family:monospace">ID: ${reg.id}</p>
-  </div>
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f9f7f4;border-radius:8px;padding:14px;border:1px solid #e5e1d8;margin-bottom:20px">
-    <tr><td style="font-size:13px;color:#6b7280;padding:3px 0">Nombre</td><td style="font-size:13px;font-weight:600;color:#1a1a1a;text-align:right">${reg.nombre}</td></tr>
-    <tr><td style="font-size:13px;color:#6b7280;padding:3px 0">Correo</td><td style="font-size:13px;color:#1a1a1a;text-align:right">${reg.correo}</td></tr>
-    <tr><td style="font-size:13px;color:#6b7280;padding:3px 0">Ciudad</td><td style="font-size:13px;color:#1a1a1a;text-align:right">${reg.ciudad}</td></tr>
-  </table>
-  <p style="font-size:12px;color:#9ca3af;text-align:center;margin:0">${evento} — Equipo organizador</p>
-</td></tr>
-</table>
-</td></tr>
-</table></body></html>`;
-
-  // Llamar a la Edge Function de Supabase (evita CORS de Resend)
-  try {
-    const res = await fetch(
-      `${SUPABASE_URL}/functions/v1/send-email`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-        },
-        body: JSON.stringify({
-          to: reg.correo,
-          subject: `✅ ¡Tu registro fue aprobado! — ${evento}`,
-          html,
-          from,
-          fromName,
-        }),
-      }
-    );
-    const data = await res.json();
-    if (!res.ok) {
-      console.error('Edge Function error:', data);
-      return { ok: false, error: data.error?.message || JSON.stringify(data) };
-    }
-    return { ok: true };
-  } catch(e) {
-    console.error('Edge Function fetch error:', e);
-    return { ok: false, error: e.message };
-  }
-}
-
-async function testEmail() {
-  const from = document.getElementById('cfg-from-email').value || 'onboarding@resend.dev';
-  const resEl = document.getElementById('test-email-res');
-  resEl.textContent = 'Enviando correo de prueba...';
-  resEl.style.cssText = 'margin-top:.65rem;font-size:.85rem;padding:.65rem .875rem;border-radius:8px;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe';
-  resEl.classList.remove('hidden');
-
-  const tmpFrom = CONFIG.fromEmail;
-  CONFIG.fromEmail = from;
-  const result = await enviarEmailAprobacion({
-    id: 'test-00000000-0000-0000-0000-000000000000',
-    nombre: 'Usuario de Prueba',
-    correo: from,
-    ciudad: 'Cochabamba'
-  });
-  CONFIG.fromEmail = tmpFrom;
-
-  if (result.ok) {
-    resEl.style.cssText = 'margin-top:.65rem;font-size:.85rem;padding:.65rem .875rem;border-radius:8px;background:#f0faf7;color:#1D6B5A;border:1px solid #a7f3d0';
-    resEl.textContent = `✓ Correo de prueba enviado a ${from}`;
-  } else {
-    resEl.style.cssText = 'margin-top:.65rem;font-size:.85rem;padding:.65rem .875rem;border-radius:8px;background:#fef2f2;color:#991b1b;border:1px solid #fca5a5';
-    resEl.textContent = `✗ Error: ${result.error}`;
-  }
-}
-
-// ─── VISTAS ───────────────────────────────────────────
+// ─── VISTAS// ─── VISTAS ───────────────────────────────────────────
 let adminLoggedIn = false;
 function showView(v) {
   document.querySelectorAll('.view,.view-wide').forEach(el=>el.classList.remove('active'));
@@ -690,7 +575,7 @@ async function lookupQR(inputId, resultId, qrBoxId) {
     }
     const r=data[0];
     if(r.estado==='pendiente'){
-      resEl.innerHTML='<div style="padding:.65rem .875rem;background:#fef9ec;color:#b45309;border:1px solid #fde68a;border-radius:8px;font-size:.875rem">⏳ Tu pago está <strong>pendiente de verificación</strong>. Cuando sea aprobado recibirás tu QR por correo.</div>';
+      resEl.innerHTML='<div style="padding:.65rem .875rem;background:#fef9ec;color:#b45309;border:1px solid #fde68a;border-radius:8px;font-size:.875rem">⏳ Tu pago está <strong>pendiente de verificación</strong>. Cuando sea aprobado podrás ver tu QR en la pestaña "Ya me registré".</div>';
       return;
     }
     if(r.estado==='rechazado'){
@@ -737,7 +622,7 @@ async function cargarRegistros() {
         <td>
           <div class="flex gap-2" style="flex-wrap:wrap">
             ${r.estado==='pendiente'?`
-              <button class="btn btn-success btn-sm" onclick="aprobarRegistro('${r.id}','${r.nombre}','${r.correo}','${r.ciudad}')">✓ Aprobar</button>
+              <button class="btn btn-success btn-sm" onclick="aprobarRegistro('${r.id}','${r.nombre}')">✓ Aprobar</button>
               <button class="btn btn-danger btn-sm" onclick="rechazarRegistro('${r.id}')">✗</button>
             `:''}
             ${r.estado==='aprobado'?`<button class="btn btn-outline btn-sm" onclick="verQRModal('${r.id}','${r.nombre}')">Ver QR</button>`:''}
@@ -762,14 +647,12 @@ function actualizarStatsData(data){
   document.getElementById('stat-aprov').textContent=data.filter(r=>r.estado==='aprobado').length;
   document.getElementById('stat-present').textContent=data.filter(r=>r.estado==='presente').length;
 }
-async function aprobarRegistro(id,nombre,correo,ciudad) {
+async function aprobarRegistro(id,nombre) {
   const btns=document.querySelectorAll('.btn-success.btn-sm');
   btns.forEach(b=>{if(b.textContent.includes('Aprobar'))b.disabled=true;});
   try {
     await sb(`registros?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({estado:'aprobado',qr_code:id}),prefer:'return=minimal'});
-    const result=await enviarEmailAprobacion({id,nombre,correo,ciudad});
-    if(result.ok) showToast(`✓ ${nombre} aprobado. Correo enviado.`);
-    else showToast(`✓ ${nombre} aprobado. Error de correo: ${result.error}`,true);
+    showToast(`✓ ${nombre} aprobado correctamente`);
     cargarRegistros();
   } catch(e){alert('Error: '+e.message);}
 }
