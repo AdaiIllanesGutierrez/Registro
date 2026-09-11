@@ -1,8 +1,86 @@
-import { useState, useMemo, useCallback } from "react";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olimpiadas Quiz</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#F0F4FF;min-height:100vh;color:#1E293B}
+.container{max-width:600px;margin:0 auto;padding:16px}
+.card{background:#fff;border-radius:20px;padding:32px 24px;box-shadow:0 8px 32px rgba(79,70,229,.12)}
+.card-sm{background:#fff;border-radius:20px;padding:24px 20px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.center{text-align:center}
+.emoji{font-size:48px;margin-bottom:8px}
+h1{font-size:26px;font-weight:700;color:#4F46E5;margin:0}
+h2{font-size:22px;margin:8px 0 4px}
+h3{font-size:16px;margin:0 0 16px;display:flex;align-items:center;gap:8px}
+.sub{color:#64748B;font-size:14px;margin-top:6px}
+.sub-sm{color:#64748B;font-size:13px}
+.label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.btn-row{display:flex;gap:8px;margin-bottom:20px}
+.btn-row.col{flex-direction:column}
+.btn{padding:12px 16px;border-radius:12px;border:2px solid #CBD5E1;background:#fff;font-weight:600;font-size:13px;cursor:pointer;transition:all .15s;text-align:left;width:100%}
+.btn:hover{border-color:#a5b4fc}
+.btn.active{border-color:#4F46E5;background:#E0E7FF;color:#3730A3}
+.btn-primary{width:100%;padding:14px;border-radius:12px;border:none;background:#4F46E5;color:#fff;font-weight:700;font-size:16px;cursor:pointer}
+.btn-primary:disabled{background:#CBD5E1;cursor:default}
+.btn-primary:not(:disabled):hover{background:#3730A3}
+.btn-outline{flex:1;padding:13px;border-radius:12px;border:2px solid #CBD5E1;background:#fff;font-weight:600;font-size:14px;cursor:pointer}
+.btn-outline:hover{border-color:#a5b4fc}
+.btn-outline:disabled{color:#CBD5E1;cursor:default}
+.btn-nav{flex:1;padding:13px;border-radius:12px;border:none;background:#4F46E5;color:#fff;font-weight:600;font-size:14px;cursor:pointer}
+.btn-nav:hover{background:#3730A3}
+.btn-finish{flex:1;padding:13px;border-radius:12px;border:none;background:#F59E0B;color:#fff;font-weight:600;font-size:14px;cursor:pointer}
+.btn-finish:hover{background:#D97706}
+.subject-count{display:block;font-size:11px;font-weight:400;color:#64748B;margin-top:2px}
+.progress-wrap{height:6px;background:#E0E7FF;border-radius:3px;margin-bottom:20px;overflow:hidden}
+.progress-bar{height:100%;background:#4F46E5;border-radius:3px;transition:width .3s}
+.header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.q-number{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#E0E7FF;color:#4F46E5;font-weight:700;font-size:14px;flex-shrink:0}
+.q-header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.q-text{font-size:16px;font-weight:600;line-height:1.5;margin-bottom:20px}
+.options{display:flex;flex-direction:column;gap:10px}
+.opt-btn{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;border:2px solid #CBD5E1;background:#fff;font-size:14px;text-align:left;cursor:pointer;transition:all .15s;line-height:1.4;width:100%}
+.opt-btn:hover{border-color:#a5b4fc}
+.opt-btn.selected{border-color:#4F46E5;background:#E0E7FF}
+.opt-letter{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;flex-shrink:0;border:2px solid #CBD5E1;background:#fff;color:#64748B;font-size:12px;font-weight:700}
+.opt-btn.selected .opt-letter{border-color:#4F46E5;background:#4F46E5;color:#fff}
+.nav-row{display:flex;gap:8px;margin-top:16px}
+.dots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:16px;padding:0 8px}
+.dot{width:28px;height:28px;border-radius:50%;border:none;font-size:10px;font-weight:600;cursor:pointer;background:#E2E8F0;color:#64748B}
+.dot.current{background:#4F46E5;color:#fff}
+.dot.answered{background:#E0E7FF;color:#4F46E5}
+.score-box{display:inline-flex;align-items:baseline;gap:4px;padding:16px 32px;border-radius:16px}
+.score-box.pass{background:#DCFCE7}
+.score-box.fail{background:#FEE2E2}
+.score-num{font-size:48px;font-weight:800}
+.score-num.pass{color:#16A34A}
+.score-num.fail{color:#DC2626}
+.score-total{font-size:20px;color:#64748B}
+.wrong-item{padding:14px 0}
+.wrong-item+.wrong-item{border-top:1px solid #CBD5E1}
+.wrong-q{font-size:13px;font-weight:600;margin-bottom:8px}
+.wrong-yours{font-size:12px;color:#DC2626;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.wrong-correct{font-size:12px;color:#16A34A;display:flex;align-items:center;gap:6px}
+.wrong-none{font-size:12px;color:#64748B;font-style:italic;margin-bottom:4px}
+.icon-circle{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;font-size:10px;line-height:16px;text-align:center;flex-shrink:0}
+.icon-wrong{background:#FEE2E2}
+.icon-right{background:#DCFCE7}
+.results-actions{display:flex;gap:8px;margin-top:24px}
+.full-center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.mb20{margin-bottom:20px}
+.mb24{margin-bottom:24px}
+.mb16{margin-bottom:16px}
+.mt8{margin-top:8px}
+</style>
+</head>
+<body>
 
-/* ──────────── DATA ──────────── */
-// Format: [questionText, [options], correctIndex]
+<div id="app"></div>
 
+<script>
+/* ══════════ DATA ══════════ */
 const EXAMS = {
   "2-primaria": {
     "Lenguaje": [
@@ -30,10 +108,10 @@ const EXAMS = {
       ["Los sinónimos son palabras que significan lo mismo. ¿Cuál es el sinónimo de la palabra \"pequeño\"?", ["Grande", "Chico", "Alto"], 1],
       ["Si completas \"_ato\" con la consonante \"g\", obtienes \"gato\". ¿Qué animal se forma si la completas con \"p\"?", ["Rato", "Pato", "Mato"], 1],
       ["Clasificación semántica: ¿Cuál de las siguientes palabras corresponde a la categoría de un COLOR?", ["Dulce", "Rojo", "Salado"], 1],
-      ["Encuentra la pareja de palabras que tienen rima consonante perfecta al terminar en \"-ón\":", ["Camión y Avión", "Camión y Casa", "Camión y Flor"], 0],
+      ["Encuentra la pareja de palabras que tienen rima consonante perfecta al terminar en \"-ón\":", ["Camión y Avión", "Camión y Casa", "Camión y Flor"], 0]
     ]
   },
-  "olimpiadas": {
+  "4-primaria": {
     "Ciencias Sociales": [
       ["La conquista española provocó grandes cambios en la vida de los pueblos originarios.", ["Verdadero", "Falso"], 0],
       ["Durante la época colonial, todos los grupos sociales tenían los mismos derechos.", ["Verdadero", "Falso"], 1],
@@ -82,7 +160,7 @@ const EXAMS = {
       ["¿Cuántas estrellas tenía el primer Escudo de Bolivia?", ["9 estrellas", "5 estrellas", "3 estrellas", "7 estrellas"], 1],
       ["¿Cuáles son las flores nacionales de Bolivia?", ["La rosa y el clavel", "La kantuta y el patujú", "La orquídea y el girasol", "El jazmín y la violeta"], 1],
       ["¿En qué año fue promulgada la actual Constitución Política del Estado boliviano?", ["2005", "2009", "2015", "2000"], 1],
-      ["¿Cuántos artículos contiene la actual Constitución Política del Estado boliviano?", ["200 artículos", "300 artículos", "411 artículos", "500 artículos"], 2],
+      ["¿Cuántos artículos contiene la actual Constitución Política del Estado boliviano?", ["200 artículos", "300 artículos", "411 artículos", "500 artículos"], 2]
     ],
     "Lenguaje": [
       ["¿Qué es la comunicación?", ["Una forma de jugar", "El proceso de transmitir y recibir información", "Una forma de escribir solamente", "Un tipo de dibujo"], 1],
@@ -128,353 +206,179 @@ const EXAMS = {
       ["¿Para qué sirve el mapa conceptual?", ["Para dibujar paisajes", "Para comprender un tema usando información visual y organizada", "Para escribir cartas", "Para hacer cálculos matemáticos"], 1],
       ["¿Cuáles son las partes reconocidas de una carta?", ["Solo saludo y despedida", "Fecha, destinatario, cargo, lugar, referencia, saludo, desarrollo, despedida y firma", "Solo el mensaje", "Título y autor"], 1],
       ["¿Cuándo se escribe con mayúscula?", ["Solo al inicio de un texto", "La primera letra de un escrito, después de punto, nombres propios y al iniciar citas textuales", "Nunca se usa mayúscula", "Solo en nombres de ciudades"], 1],
-      ["¿Cuáles son las partes de una receta de cocina?", ["Solo los ingredientes", "Nombre del plato, tiempo de preparación, ingredientes e instrucciones", "Solo el nombre del plato", "Título y firma del chef"], 1],
+      ["¿Cuáles son las partes de una receta de cocina?", ["Solo los ingredientes", "Nombre del plato, tiempo de preparación, ingredientes e instrucciones", "Solo el nombre del plato", "Título y firma del chef"], 1]
     ]
   }
 };
 
 const COURSES = [
   { id: "2-primaria", label: "2° de Primaria" },
-  { id: "olimpiadas", label: "4° de Primaria" },
+  { id: "4-primaria", label: "4° de Primaria" }
 ];
 
-/* ──────────── HELPERS ──────────── */
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+/* ══════════ STATE ══════════ */
+let state = { screen: "start", courseId: "", subject: "", questions: [], current: 0, answers: {}, submitted: false };
+
+/* ══════════ HELPERS ══════════ */
+function shuffle(a) { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
 function prepareQuestions(raw) {
   return shuffle(raw).map(([q, opts, correct]) => {
     const correctText = opts[correct];
     const shuffled = shuffle(opts.map((o, i) => ({ text: o, orig: i })));
-    return {
-      question: q,
-      options: shuffled.map(s => s.text),
-      correctIndex: shuffled.findIndex(s => s.text === correctText),
-    };
+    return { question: q, options: shuffled.map(s => s.text), correctIndex: shuffled.findIndex(s => s.text === correctText) };
   });
 }
 
-/* ──────────── STYLES ──────────── */
-const palette = {
-  bg: "#F0F4FF",
-  card: "#FFFFFF",
-  primary: "#4F46E5",
-  primaryLight: "#E0E7FF",
-  primaryDark: "#3730A3",
-  correct: "#16A34A",
-  correctBg: "#DCFCE7",
-  wrong: "#DC2626",
-  wrongBg: "#FEE2E2",
-  text: "#1E293B",
-  muted: "#64748B",
-  border: "#CBD5E1",
-  accent: "#F59E0B",
-  accentBg: "#FEF3C7",
-};
+function letter(i) { return String.fromCharCode(65 + i); }
 
-export default function QuizApp() {
-  const [screen, setScreen] = useState("start");
-  const [courseId, setCourseId] = useState("");
-  const [subject, setSubject] = useState("");
-  const [questions, setQuestions] = useState([]);
-  const [current, setCurrent] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+function render() {
+  const app = document.getElementById("app");
+  if (state.screen === "start") app.innerHTML = renderStart();
+  else if (state.submitted) app.innerHTML = renderResults();
+  else app.innerHTML = renderQuiz();
+  bindEvents();
+}
 
-  const subjects = courseId ? Object.keys(EXAMS[courseId] || {}) : [];
+/* ══════════ START SCREEN ══════════ */
+function renderStart() {
+  const subjects = state.courseId ? Object.keys(EXAMS[state.courseId] || {}) : [];
+  const canStart = state.courseId && state.subject;
+  let subjectHTML = "";
+  if (subjects.length) {
+    subjectHTML = `<div class="label">Materia</div><div class="btn-row col mb24">` +
+      subjects.map(s => {
+        const icon = s === "Ciencias Sociales" ? "🌍" : "📖";
+        const count = EXAMS[state.courseId][s].length;
+        return `<button class="btn${state.subject === s ? " active" : ""}" data-action="subject" data-val="${s}">${icon} ${s}<span class="subject-count">${count} preguntas</span></button>`;
+      }).join("") + `</div>`;
+  }
+  return `<div class="full-center"><div class="card" style="max-width:440px;width:100%">
+    <div class="center mb24"><div class="emoji">📝</div><h1>Olimpiadas Quiz</h1><p class="sub">Selecciona tu curso y materia para comenzar</p></div>
+    <div class="label">Curso</div>
+    <div class="btn-row mb20">${COURSES.map(c => `<button class="btn${state.courseId === c.id ? " active" : ""}" style="flex:1;text-align:center" data-action="course" data-val="${c.id}">${c.label}</button>`).join("")}</div>
+    ${subjectHTML}
+    <button class="btn-primary" ${canStart ? "" : "disabled"} data-action="start">Comenzar examen</button>
+  </div></div>`;
+}
 
-  const startQuiz = useCallback(() => {
-    if (!courseId || !subject) return;
-    const raw = EXAMS[courseId][subject];
-    setQuestions(prepareQuestions(raw));
-    setAnswers({});
-    setCurrent(0);
-    setSubmitted(false);
-    setScreen("quiz");
-  }, [courseId, subject]);
+/* ══════════ QUIZ SCREEN ══════════ */
+function renderQuiz() {
+  const q = state.questions[state.current];
+  const total = state.questions.length;
+  const answered = Object.keys(state.answers).length;
+  const pct = ((state.current + 1) / total) * 100;
+  const isLast = state.current >= total - 1;
 
-  const selectAnswer = (qi, oi) => {
-    if (submitted) return;
-    setAnswers(prev => ({ ...prev, [qi]: oi }));
-  };
+  return `<div class="container">
+    <div class="header-row">
+      <span style="font-size:13px;font-weight:600;color:#4F46E5">${state.subject}</span>
+      <span class="sub-sm">${answered}/${total} respondidas</span>
+    </div>
+    <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%"></div></div>
+    <div class="card mb16">
+      <div class="q-header"><span class="q-number">${state.current + 1}</span><span class="sub-sm">de ${total}</span></div>
+      <p class="q-text">${q.question}</p>
+      <div class="options">${q.options.map((o, i) => {
+        const sel = state.answers[state.current] === i;
+        return `<button class="opt-btn${sel ? " selected" : ""}" data-action="answer" data-val="${i}"><span class="opt-letter">${letter(i)}</span>${o}</button>`;
+      }).join("")}</div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-outline" ${state.current === 0 ? "disabled" : ""} data-action="prev">← Anterior</button>
+      ${isLast
+        ? `<button class="btn-finish" data-action="finish">Finalizar ✓</button>`
+        : `<button class="btn-nav" data-action="next">Siguiente →</button>`}
+    </div>
+    <div class="dots">${state.questions.map((_, i) => {
+      let cls = "dot";
+      if (i === state.current) cls += " current";
+      else if (state.answers[i] !== undefined) cls += " answered";
+      return `<button class="${cls}" data-action="goto" data-val="${i}">${i + 1}</button>`;
+    }).join("")}</div>
+  </div>`;
+}
 
-  const finish = () => setSubmitted(true);
+/* ══════════ RESULTS SCREEN ══════════ */
+function renderResults() {
+  const total = state.questions.length;
+  const score = state.questions.reduce((s, q, i) => s + (state.answers[i] === q.correctIndex ? 1 : 0), 0);
+  const pct = Math.round((score / total) * 100);
+  const pass = pct >= 60;
+  const emoji = pct >= 80 ? "🏆" : pct >= 60 ? "👍" : pct >= 40 ? "💪" : "📚";
 
-  const score = useMemo(() => {
-    if (!submitted) return 0;
-    return questions.reduce((s, q, i) => s + (answers[i] === q.correctIndex ? 1 : 0), 0);
-  }, [submitted, questions, answers]);
+  const wrong = state.questions
+    .map((q, i) => ({ ...q, idx: i, userAns: state.answers[i] }))
+    .filter(q => q.userAns !== q.correctIndex);
 
-  const wrongOnes = useMemo(() => {
-    if (!submitted) return [];
-    return questions
-      .map((q, i) => ({ ...q, index: i, userAnswer: answers[i] }))
-      .filter(q => q.userAnswer !== q.correctIndex);
-  }, [submitted, questions, answers]);
-
-  const restart = () => {
-    setScreen("start");
-    setCourseId("");
-    setSubject("");
-    setQuestions([]);
-    setAnswers({});
-    setSubmitted(false);
-    setCurrent(0);
-  };
-
-  const retryQuiz = () => {
-    const raw = EXAMS[courseId][subject];
-    setQuestions(prepareQuestions(raw));
-    setAnswers({});
-    setCurrent(0);
-    setSubmitted(false);
-  };
-
-  /* ─── START SCREEN ─── */
-  if (screen === "start") {
-    return (
-      <div style={{ minHeight: "100vh", background: palette.bg, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif" }}>
-        <div style={{ background: palette.card, borderRadius: 20, padding: "40px 32px", maxWidth: 440, width: "100%", boxShadow: "0 8px 32px rgba(79,70,229,0.12)" }}>
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
-            <div style={{ fontSize: 48, marginBottom: 8 }}>📝</div>
-            <h1 style={{ fontSize: 26, fontWeight: 700, color: palette.primary, margin: 0 }}>Olimpiadas Quiz</h1>
-            <p style={{ color: palette.muted, fontSize: 14, marginTop: 6 }}>Selecciona tu curso y materia para comenzar</p>
-          </div>
-
-          <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: palette.text, marginBottom: 6 }}>Curso</label>
-          <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-            {COURSES.map(c => (
-              <button
-                key={c.id}
-                onClick={() => { setCourseId(c.id); setSubject(""); }}
-                style={{
-                  flex: 1, padding: "12px 8px", borderRadius: 12, border: `2px solid ${courseId === c.id ? palette.primary : palette.border}`,
-                  background: courseId === c.id ? palette.primaryLight : "white", color: courseId === c.id ? palette.primaryDark : palette.text,
-                  fontWeight: 600, fontSize: 13, cursor: "pointer", transition: "all .15s"
-                }}
-              >{c.label}</button>
-            ))}
-          </div>
-
-          {subjects.length > 0 && (
-            <>
-              <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: palette.text, marginBottom: 6 }}>Materia</label>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
-                {subjects.map(s => (
-                  <button
-                    key={s}
-                    onClick={() => setSubject(s)}
-                    style={{
-                      padding: "12px 16px", borderRadius: 12, border: `2px solid ${subject === s ? palette.primary : palette.border}`,
-                      background: subject === s ? palette.primaryLight : "white", color: subject === s ? palette.primaryDark : palette.text,
-                      fontWeight: 600, fontSize: 14, cursor: "pointer", textAlign: "left", transition: "all .15s"
-                    }}
-                  >
-                    {s === "Ciencias Sociales" ? "🌍 " : "📖 "}{s}
-                    <span style={{ display: "block", fontSize: 11, fontWeight: 400, color: palette.muted, marginTop: 2 }}>
-                      {EXAMS[courseId][s].length} preguntas
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-
-          <button
-            onClick={startQuiz}
-            disabled={!courseId || !subject}
-            style={{
-              width: "100%", padding: 14, borderRadius: 12, border: "none",
-              background: (!courseId || !subject) ? palette.border : palette.primary,
-              color: "white", fontWeight: 700, fontSize: 16, cursor: (!courseId || !subject) ? "default" : "pointer",
-              transition: "all .15s"
-            }}
-          >Comenzar examen</button>
-        </div>
-      </div>
-    );
+  let wrongHTML = "";
+  if (wrong.length) {
+    wrongHTML = `<div class="card-sm" style="margin-top:20px">
+      <h3 style="color:#DC2626"><span>✗</span> Preguntas incorrectas (${wrong.length})</h3>
+      ${wrong.map((w, i) => {
+        const yours = w.userAns !== undefined
+          ? `<div class="wrong-yours"><span class="icon-circle icon-wrong">✗</span>Tu respuesta: ${w.options[w.userAns]}</div>`
+          : `<div class="wrong-none">Sin respuesta</div>`;
+        return `<div class="wrong-item">
+          <p class="wrong-q">${w.question}</p>
+          ${yours}
+          <div class="wrong-correct"><span class="icon-circle icon-right">✓</span>Respuesta correcta: ${w.options[w.correctIndex]}</div>
+        </div>`;
+      }).join("")}
+    </div>`;
   }
 
-  /* ─── RESULTS SCREEN ─── */
-  if (screen === "quiz" && submitted) {
-    const pct = Math.round((score / questions.length) * 100);
-    const emoji = pct >= 80 ? "🏆" : pct >= 60 ? "👍" : pct >= 40 ? "💪" : "📚";
-    return (
-      <div style={{ minHeight: "100vh", background: palette.bg, padding: 16, fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif" }}>
-        <div style={{ maxWidth: 600, margin: "0 auto" }}>
-          {/* Score card */}
-          <div style={{ background: palette.card, borderRadius: 20, padding: "32px 24px", textAlign: "center", boxShadow: "0 8px 32px rgba(79,70,229,0.12)", marginBottom: 20 }}>
-            <div style={{ fontSize: 56 }}>{emoji}</div>
-            <h2 style={{ fontSize: 22, color: palette.text, margin: "8px 0 4px" }}>Resultados del examen</h2>
-            <p style={{ color: palette.muted, fontSize: 13, margin: "0 0 20px" }}>{subject}</p>
-
-            <div style={{ display: "inline-flex", alignItems: "baseline", gap: 4, background: pct >= 60 ? palette.correctBg : palette.wrongBg, padding: "16px 32px", borderRadius: 16 }}>
-              <span style={{ fontSize: 48, fontWeight: 800, color: pct >= 60 ? palette.correct : palette.wrong }}>{score}</span>
-              <span style={{ fontSize: 20, color: palette.muted }}>/ {questions.length}</span>
-            </div>
-            <p style={{ fontSize: 14, color: palette.muted, marginTop: 8 }}>{pct}% de aciertos</p>
-
-            <div style={{ display: "flex", gap: 8, marginTop: 24 }}>
-              <button onClick={retryQuiz} style={{ flex: 1, padding: 12, borderRadius: 12, border: `2px solid ${palette.primary}`, background: "white", color: palette.primary, fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
-                Reintentar
-              </button>
-              <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", background: palette.primary, color: "white", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
-                Inicio
-              </button>
-            </div>
-          </div>
-
-          {/* Wrong answers */}
-          {wrongOnes.length > 0 && (
-            <div style={{ background: palette.card, borderRadius: 20, padding: "24px 20px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
-              <h3 style={{ fontSize: 16, color: palette.wrong, margin: "0 0 16px", display: "flex", alignItems: "center", gap: 8 }}>
-                <span>✗</span> Preguntas incorrectas ({wrongOnes.length})
-              </h3>
-              {wrongOnes.map((w, i) => (
-                <div key={i} style={{ padding: "14px 0", borderTop: i > 0 ? `1px solid ${palette.border}` : "none" }}>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: palette.text, margin: "0 0 8px" }}>{w.question}</p>
-                  {w.userAnswer !== undefined ? (
-                    <p style={{ fontSize: 12, color: palette.wrong, margin: "0 0 4px", display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ display: "inline-block", width: 16, height: 16, borderRadius: "50%", background: palette.wrongBg, textAlign: "center", lineHeight: "16px", fontSize: 10 }}>✗</span>
-                      Tu respuesta: {w.options[w.userAnswer]}
-                    </p>
-                  ) : (
-                    <p style={{ fontSize: 12, color: palette.muted, margin: "0 0 4px", fontStyle: "italic" }}>Sin respuesta</p>
-                  )}
-                  <p style={{ fontSize: 12, color: palette.correct, margin: 0, display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{ display: "inline-block", width: 16, height: 16, borderRadius: "50%", background: palette.correctBg, textAlign: "center", lineHeight: "16px", fontSize: 10 }}>✓</span>
-                    Respuesta correcta: {w.options[w.correctIndex]}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+  return `<div class="container">
+    <div class="card center">
+      <div style="font-size:56px">${emoji}</div>
+      <h2>Resultados del examen</h2>
+      <p class="sub-sm" style="margin-bottom:20px">${state.subject}</p>
+      <div class="score-box ${pass ? "pass" : "fail"}">
+        <span class="score-num ${pass ? "pass" : "fail"}">${score}</span>
+        <span class="score-total">/ ${total}</span>
       </div>
-    );
-  }
-
-  /* ─── QUIZ SCREEN ─── */
-  const q = questions[current];
-  const totalQ = questions.length;
-  const answered = Object.keys(answers).length;
-  const progress = ((current + 1) / totalQ) * 100;
-
-  return (
-    <div style={{ minHeight: "100vh", background: palette.bg, padding: 16, fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif" }}>
-      <div style={{ maxWidth: 600, margin: "0 auto" }}>
-        {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: palette.primary }}>{subject}</span>
-          <span style={{ fontSize: 12, color: palette.muted }}>{answered}/{totalQ} respondidas</span>
-        </div>
-
-        {/* Progress bar */}
-        <div style={{ height: 6, background: palette.primaryLight, borderRadius: 3, marginBottom: 20, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: `${progress}%`, background: palette.primary, borderRadius: 3, transition: "width .3s" }} />
-        </div>
-
-        {/* Question card */}
-        <div style={{ background: palette.card, borderRadius: 20, padding: "28px 24px", boxShadow: "0 4px 20px rgba(79,70,229,0.08)", marginBottom: 16 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-            <span style={{
-              display: "inline-flex", alignItems: "center", justifyContent: "center",
-              width: 36, height: 36, borderRadius: "50%", background: palette.primaryLight,
-              color: palette.primary, fontWeight: 700, fontSize: 14, flexShrink: 0
-            }}>{current + 1}</span>
-            <span style={{ fontSize: 12, color: palette.muted }}>de {totalQ}</span>
-          </div>
-
-          <p style={{ fontSize: 16, fontWeight: 600, color: palette.text, margin: "0 0 20px", lineHeight: 1.5 }}>{q.question}</p>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {q.options.map((opt, oi) => {
-              const selected = answers[current] === oi;
-              return (
-                <button
-                  key={oi}
-                  onClick={() => selectAnswer(current, oi)}
-                  style={{
-                    display: "flex", alignItems: "center", gap: 12,
-                    padding: "14px 16px", borderRadius: 14,
-                    border: `2px solid ${selected ? palette.primary : palette.border}`,
-                    background: selected ? palette.primaryLight : "white",
-                    color: palette.text, fontSize: 14, textAlign: "left",
-                    cursor: "pointer", transition: "all .15s", lineHeight: 1.4
-                  }}
-                >
-                  <span style={{
-                    display: "inline-flex", alignItems: "center", justifyContent: "center",
-                    width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
-                    border: `2px solid ${selected ? palette.primary : palette.border}`,
-                    background: selected ? palette.primary : "white",
-                    color: selected ? "white" : palette.muted,
-                    fontSize: 12, fontWeight: 700
-                  }}>
-                    {String.fromCharCode(65 + oi)}
-                  </span>
-                  {opt}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <div style={{ display: "flex", gap: 8 }}>
-          <button
-            onClick={() => setCurrent(c => Math.max(0, c - 1))}
-            disabled={current === 0}
-            style={{
-              flex: 1, padding: 13, borderRadius: 12, border: `2px solid ${palette.border}`,
-              background: "white", color: current === 0 ? palette.border : palette.text,
-              fontWeight: 600, fontSize: 14, cursor: current === 0 ? "default" : "pointer"
-            }}
-          >← Anterior</button>
-
-          {current < totalQ - 1 ? (
-            <button
-              onClick={() => setCurrent(c => Math.min(totalQ - 1, c + 1))}
-              style={{
-                flex: 1, padding: 13, borderRadius: 12, border: "none",
-                background: palette.primary, color: "white",
-                fontWeight: 600, fontSize: 14, cursor: "pointer"
-              }}
-            >Siguiente →</button>
-          ) : (
-            <button
-              onClick={finish}
-              style={{
-                flex: 1, padding: 13, borderRadius: 12, border: "none",
-                background: palette.accent, color: "white",
-                fontWeight: 600, fontSize: 14, cursor: "pointer"
-              }}
-            >Finalizar ✓</button>
-          )}
-        </div>
-
-        {/* Question dots */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginTop: 16, padding: "0 8px" }}>
-          {questions.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              style={{
-                width: 28, height: 28, borderRadius: "50%", border: "none",
-                fontSize: 10, fontWeight: 600, cursor: "pointer",
-                background: i === current ? palette.primary : (answers[i] !== undefined ? palette.primaryLight : "#E2E8F0"),
-                color: i === current ? "white" : (answers[i] !== undefined ? palette.primary : palette.muted),
-              }}
-            >{i + 1}</button>
-          ))}
-        </div>
+      <p class="sub-sm mt8">${pct}% de aciertos</p>
+      <div class="results-actions">
+        <button class="btn-outline" style="flex:1" data-action="retry">Reintentar</button>
+        <button class="btn-nav" style="flex:1" data-action="home">Inicio</button>
       </div>
     </div>
-  );
+    ${wrongHTML}
+  </div>`;
 }
+
+/* ══════════ EVENT BINDING ══════════ */
+function bindEvents() {
+  document.querySelectorAll("[data-action]").forEach(el => {
+    el.addEventListener("click", () => {
+      const action = el.dataset.action;
+      const val = el.dataset.val;
+      switch (action) {
+        case "course": state.courseId = val; state.subject = ""; break;
+        case "subject": state.subject = val; break;
+        case "start":
+          if (state.courseId && state.subject) {
+            state.questions = prepareQuestions(EXAMS[state.courseId][state.subject]);
+            state.answers = {}; state.current = 0; state.submitted = false; state.screen = "quiz";
+          } break;
+        case "answer": state.answers = { ...state.answers, [state.current]: parseInt(val) }; break;
+        case "prev": state.current = Math.max(0, state.current - 1); break;
+        case "next": state.current = Math.min(state.questions.length - 1, state.current + 1); break;
+        case "goto": state.current = parseInt(val); break;
+        case "finish": state.submitted = true; break;
+        case "retry":
+          state.questions = prepareQuestions(EXAMS[state.courseId][state.subject]);
+          state.answers = {}; state.current = 0; state.submitted = false; break;
+        case "home":
+          state = { screen: "start", courseId: "", subject: "", questions: [], current: 0, answers: {}, submitted: false }; break;
+      }
+      render();
+      window.scrollTo(0, 0);
+    });
+  });
+}
+
+render();
+</script>
+</body>
+</html>
