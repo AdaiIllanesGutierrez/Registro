@@ -1,767 +1,480 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registro al Evento</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap');
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#F7F5F0;--card:#fff;--text:#1a1a1a;--muted:#6b7280;--border:#e5e1d8;
-  --accent:#B85C2A;--accent2:#1D6B5A;--danger:#C0392B;--success:#1D6B5A;
-  --font:'DM Sans',sans-serif;
-}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
-h1,h2,h3{font-family:'DM Serif Display',serif}
-nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
-.nav-brand{font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--accent)}
-.nav-tabs{display:flex;gap:0.25rem}
-.nav-tab{background:none;border:none;padding:0.5rem 0.875rem;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:0.875rem;color:var(--muted);transition:all 0.15s}
-.nav-tab.active{background:#F7F5F0;color:var(--text);font-weight:500}
-.nav-tab:hover:not(.active){background:#f3f0eb}
-.view{display:none;padding:1.5rem;max-width:660px;margin:0 auto}
-.view.active{display:block}
-.view-wide{display:none;padding:1.5rem;max-width:980px;margin:0 auto}
-.view-wide.active{display:block}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
-.card-title{font-size:1.4rem;margin-bottom:0.2rem}
-.card-sub{color:var(--muted);font-size:0.875rem;margin-bottom:1.25rem}
-.field{margin-bottom:0.9rem}
-.field label{display:block;font-size:0.75rem;font-weight:500;color:var(--muted);margin-bottom:0.3rem;text-transform:uppercase;letter-spacing:0.04em}
-.field input,.field select,.field textarea{width:100%;padding:0.6rem 0.85rem;border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:0.9375rem;background:var(--card);color:var(--text);transition:border 0.15s;outline:none}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:0.875rem}
-.err-msg{color:var(--danger);font-size:0.8rem;margin-top:0.3rem;display:none}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;padding:0.7rem 1.4rem;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:0.9375rem;font-weight:500;transition:all 0.15s}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:#9e4e22}
-.btn-primary:disabled{background:#ccc;cursor:not-allowed}
-.btn-success{background:var(--accent2);color:#fff}
-.btn-success:hover{background:#155a49}
-.btn-danger{background:var(--danger);color:#fff}
-.btn-danger:hover{background:#a52820}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
-.btn-outline:hover{background:var(--bg)}
-.btn-full{width:100%}
-.btn-sm{padding:0.4rem 0.8rem;font-size:0.8125rem}
-.qr-payment-block{background:linear-gradient(135deg,#fdf8f5,#fff8f2);border:1px solid #f0d8c8;border-radius:12px;padding:1.5rem;text-align:center;margin:0.875rem 0}
-.qr-img-wrap{width:190px;height:190px;margin:0.875rem auto;border:2px dashed #d4a882;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#fff;overflow:hidden}
-.qr-img-wrap img{width:100%;height:100%;object-fit:cover}
-.steps{display:flex;margin-bottom:1.25rem;border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.step{flex:1;padding:0.55rem;text-align:center;font-size:0.75rem;font-weight:500;color:var(--muted);background:var(--card);transition:all 0.2s}
-.step.active{background:var(--accent);color:#fff}
-.step.done{background:#f0faf7;color:var(--accent2)}
-.badge{display:inline-flex;align-items:center;padding:0.18rem 0.55rem;border-radius:20px;font-size:0.75rem;font-weight:500}
-.badge-pending{background:#fef9ec;color:#b45309;border:1px solid #fde68a}
-.badge-approved{background:#f0faf7;color:#1D6B5A;border:1px solid #a7f3d0}
-.badge-rejected{background:#fef2f2;color:#991b1b;border:1px solid #fca5a5}
-.badge-present{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
-.table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
-table{width:100%;border-collapse:collapse;font-size:0.85rem}
-th{background:#f9f7f4;padding:0.55rem 0.85rem;text-align:left;font-weight:500;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--muted);border-bottom:1px solid var(--border)}
-td{padding:0.7rem 0.85rem;border-bottom:1px solid var(--border);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:#fafaf9}
-.alert{padding:0.8rem 1rem;border-radius:8px;font-size:0.875rem;margin-bottom:0.875rem;display:flex;align-items:flex-start;gap:0.5rem}
-.alert-success{background:#f0faf7;color:#1D6B5A;border:1px solid #a7f3d0}
-.alert-error{background:#fef2f2;color:#991b1b;border:1px solid #fca5a5}
-.alert-info{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
-.alert-warning{background:#fef9ec;color:#b45309;border:1px solid #fde68a}
-.upload-area{border:2px dashed var(--border);border-radius:8px;padding:1.5rem;text-align:center;cursor:pointer;transition:all 0.15s;background:#fafaf9}
-.upload-area:hover{border-color:var(--accent);background:#fdf9f7}
-.upload-area input[type=file]{display:none}
-.loader{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
-.modal-box{background:var(--card);border-radius:16px;padding:2rem;max-width:460px;width:100%;max-height:90vh;overflow-y:auto}
-.divider{border:none;border-top:1px solid var(--border);margin:1.25rem 0}
-.text-center{text-align:center}
-.text-muted{color:var(--muted);font-size:0.875rem}
-.mt-1{margin-top:0.5rem}.mt-2{margin-top:1rem}.mt-3{margin-top:1.5rem}
-.flex{display:flex}.gap-2{gap:0.5rem}.items-center{align-items:center}.justify-between{justify-content:space-between}
-.hidden{display:none!important}
-.admin-login-wrap{max-width:360px;margin:3rem auto}
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.65rem;margin-bottom:1.1rem}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.875rem;text-align:center}
-.stat-num{font-size:1.6rem;font-weight:600;font-family:'DM Serif Display',serif}
-.stat-label{font-size:0.72rem;color:var(--muted);margin-top:0.1rem}
-.tab-bar{display:flex;gap:0.4rem;margin-bottom:1.1rem;flex-wrap:wrap}
-.tab-btn{padding:0.45rem 0.9rem;border-radius:8px;border:1px solid var(--border);background:var(--card);font-family:var(--font);font-size:0.85rem;cursor:pointer;color:var(--muted);transition:all 0.15s}
-.tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.confirmation-box{background:linear-gradient(135deg,#f0faf7,#e8f5f0);border:1px solid #a7f3d0;border-radius:12px;padding:1.5rem;text-align:center;margin:1rem 0}
-.pending-box{background:linear-gradient(135deg,#fef9ec,#fff8e8);border:1px solid #fde68a;border-radius:12px;padding:1.5rem;text-align:center;margin:1rem 0}
-.qr-lookup-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-top:1rem}
-#qrcode-display,#qrcode-paso3,#qrcode-lookup{display:flex;justify-content:center;margin:0.875rem auto}
-#qrcode-display canvas,#qrcode-display img,
-#qrcode-paso3 canvas,#qrcode-paso3 img,
-#qrcode-lookup canvas,#qrcode-lookup img{border:6px solid white;box-shadow:0 2px 16px rgba(0,0,0,0.1);border-radius:4px}
-.scanner-box{border:2px dashed var(--border);border-radius:12px;padding:1.5rem;text-align:center;background:#fafaf9}
-#scanner-video{width:100%;max-width:300px;border-radius:8px;margin:0.875rem auto;display:block}
-.scan-result{margin-top:0.875rem;padding:0.875rem 1rem;border-radius:8px;display:none;font-weight:500;font-size:0.9rem;line-height:1.5}
-.scan-ok{background:#f0faf7;border:1px solid #a7f3d0;color:#1D6B5A}
-.scan-warn{background:#fef9ec;border:1px solid #fde68a;color:#b45309}
-.scan-err{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}
-.cfg-section{border-top:1px solid var(--border);padding-top:1.1rem;margin-top:1.1rem}
-.cfg-label{font-size:0.875rem;font-weight:500;color:var(--text);margin-bottom:0.65rem;display:flex;align-items:center;gap:0.4rem}
-/* Lookup tab en formulario público */
-.lookup-tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:1.25rem}
-.lookup-tab{flex:1;padding:0.7rem;text-align:center;font-size:0.875rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s}
-.lookup-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-</style>
-</head>
-<body>
+import { useState, useMemo, useCallback } from "react";
 
-<nav>
-  <span class="nav-brand" id="nav-brand">🎟 Evento</span>
-  <div class="nav-tabs">
-    <button class="nav-tab active" onclick="showView('registro')">Registro</button>
-    <button class="nav-tab" onclick="showView('admin-login')">Admin</button>
-  </div>
-</nav>
+/* ──────────── DATA ──────────── */
+// Format: [questionText, [options], correctIndex]
 
-<!-- ══════════════ VISTA PÚBLICA ══════════════ -->
-<div id="view-registro" class="view active">
-  <div class="card">
-
-    <!-- TABS: Nuevo registro / Ya me registré -->
-    <div class="lookup-tab-bar">
-      <div class="lookup-tab active" id="ltab-nuevo" onclick="switchLookupTab('nuevo')">Registrarme</div>
-      <div class="lookup-tab" id="ltab-consulta" onclick="switchLookupTab('consulta')">Ya me registré · Ver mi QR</div>
-    </div>
-
-    <!-- ── PANEL NUEVO REGISTRO ── -->
-    <div id="panel-nuevo">
-      <div class="steps">
-        <div class="step active" id="step1-ind">1 · Datos</div>
-        <div class="step" id="step2-ind">2 · Pago</div>
-        <div class="step" id="step3-ind">3 · Confirmación</div>
-      </div>
-
-      <!-- Paso 1 -->
-      <div id="paso1">
-        <div class="field-row">
-          <div class="field"><label>Nombre</label><input type="text" id="reg-nombre" placeholder="Juan"></div>
-          <div class="field"><label>Apellido</label><input type="text" id="reg-apellido" placeholder="Pérez"></div>
-        </div>
-        <div class="field">
-          <label>Correo electrónico</label>
-          <input type="email" id="reg-correo" placeholder="juan@correo.com">
-          <div class="err-msg" id="err-correo-dup">⚠ Este correo ya está registrado. Ve a "Ya me registré" para ver tu QR.</div>
-        </div>
-        <div class="field-row">
-          <div class="field"><label>Teléfono</label><input type="tel" id="reg-telefono" placeholder="+591 70000000"></div>
-          <div class="field"><label>CI / DNI</label><input type="text" id="reg-ci" placeholder="1234567"></div>
-        </div>
-        <div class="field">
-          <label>Ciudad</label>
-          <select id="reg-ciudad">
-            <option value="">Selecciona tu ciudad</option>
-            <option>Cochabamba</option><option>La Paz</option><option>Santa Cruz</option>
-            <option>Oruro</option><option>Potosí</option><option>Sucre</option>
-            <option>Tarija</option><option>Beni</option><option>Pando</option><option>Otra</option>
-          </select>
-        </div>
-        <div class="alert alert-error hidden" id="err-form-gen">Por favor completa todos los campos.</div>
-        <button class="btn btn-primary btn-full mt-2" onclick="irPaso2()">Continuar al pago →</button>
-      </div>
-
-      <!-- Paso 2 -->
-      <div id="paso2" class="hidden">
-        <div class="qr-payment-block">
-          <p style="font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;font-weight:500">Escanea para pagar</p>
-          <div class="qr-img-wrap">
-            <div id="qr-pay-ph" style="color:var(--muted);font-size:0.75rem;text-align:center;padding:0.75rem">
-              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#d4a882" stroke-width="1.5" style="margin:0 auto 0.4rem;display:block"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3" rx="0.5"/><rect x="18" y="14" width="3" height="3" rx="0.5"/><rect x="14" y="18" width="3" height="3" rx="0.5"/><rect x="18" y="18" width="3" height="3" rx="0.5"/></svg>
-              QR de pago del administrador
-            </div>
-            <img id="qr-pay-img" src="" alt="QR pago" style="display:none;width:100%;height:100%;object-fit:cover">
-          </div>
-          <p style="font-size:1.05rem;font-weight:600;color:var(--accent)" id="monto-display">Bs. 100</p>
-          <p style="font-size:0.8rem;color:var(--muted);margin-top:0.2rem" id="banco-display">Cuenta del evento</p>
-        </div>
-        <div class="field mt-2">
-          <label>Número de comprobante / referencia de pago</label>
-          <input type="text" id="reg-comprobante" placeholder="Ej: TRX-20250605-001">
-        </div>
-        <div class="field">
-          <label>Captura del comprobante (opcional pero recomendado)</label>
-          <div class="upload-area" onclick="document.getElementById('reg-img').click()">
-            <input type="file" id="reg-img" accept="image/*" onchange="previewImg(event)">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b08060" stroke-width="1.5" style="margin:0 auto 0.4rem;display:block"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <p style="font-size:0.8rem;color:var(--muted)">Click para subir imagen</p>
-            <p id="img-name" style="font-size:0.75rem;color:var(--accent);margin-top:0.3rem"></p>
-          </div>
-        </div>
-        <div class="alert alert-info" style="font-size:0.85rem">
-          El admin verificará tu pago. Una vez aprobado, podrás ver tu QR aquí en la pestaña "Ya me registré".
-        </div>
-        <div class="flex gap-2">
-          <button class="btn btn-outline" onclick="irPaso1()" style="flex:0 0 auto">← Volver</button>
-          <button class="btn btn-primary btn-full" onclick="enviarRegistro()" id="btn-enviar">Enviar registro</button>
-        </div>
-      </div>
-
-      <!-- Paso 3 -->
-      <div id="paso3" class="hidden text-center">
-        <div id="p3-pendiente">
-          <div class="pending-box">
-            <div style="font-size:2.75rem;margin-bottom:0.5rem">⏳</div>
-            <h2 style="font-size:1.15rem;margin-bottom:0.4rem">¡Registro enviado!</h2>
-            <p class="text-muted" style="font-size:0.875rem">Tu pago está pendiente de verificación. Cuando sea aprobado podrás ver tu QR consultando con tu correo abajo.</p>
-          </div>
-          <div class="qr-lookup-box">
-            <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.65rem">Consulta el estado de tu registro con tu correo:</p>
-            <div class="flex gap-2">
-              <input type="email" id="lookup-correo-p3" placeholder="tu@correo.com" style="flex:1;padding:0.6rem 0.85rem;border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:0.9rem">
-              <button class="btn btn-outline" style="flex:0 0 auto" onclick="lookupQR('lookup-correo-p3','lookup-result-p3','qrcode-p3-box')">Ver QR</button>
-            </div>
-            <div id="lookup-result-p3" style="margin-top:0.75rem"></div>
-            <div id="qrcode-p3-box" style="display:flex;justify-content:center;margin-top:0.75rem"></div>
-          </div>
-        </div>
-        <button class="btn btn-outline mt-2" onclick="resetForm()">Registrar otra persona</button>
-      </div>
-    </div>
-
-    <!-- ── PANEL YA ME REGISTRÉ ── -->
-    <div id="panel-consulta" class="hidden">
-      <p class="text-muted" style="margin-bottom:1rem;font-size:0.9rem">Ingresa el correo con el que te registraste para ver el estado de tu inscripción y tu QR de acceso.</p>
-      <div class="field">
-        <label>Correo electrónico</label>
-        <input type="email" id="lookup-correo-main" placeholder="tu@correo.com" onkeydown="if(event.key==='Enter')lookupQR('lookup-correo-main','lookup-result-main','qrcode-main-box')">
-      </div>
-      <button class="btn btn-primary btn-full" onclick="lookupQR('lookup-correo-main','lookup-result-main','qrcode-main-box')">Consultar mi registro</button>
-      <div id="lookup-result-main" style="margin-top:1rem"></div>
-      <div id="qrcode-main-box" style="display:flex;justify-content:center;margin-top:0.875rem"></div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ══════════════ ADMIN LOGIN ══════════════ -->
-<div id="view-admin-login" class="view">
-  <div class="admin-login-wrap">
-    <div class="card">
-      <h2 class="card-title" style="font-size:1.3rem">Panel administrativo</h2>
-      <p class="card-sub">Solo para organizadores.</p>
-      <div class="field">
-        <label>Contraseña</label>
-        <input type="password" id="admin-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginAdmin()">
-      </div>
-      <div class="alert alert-error hidden" id="err-login">Contraseña incorrecta.</div>
-      <button class="btn btn-primary btn-full" onclick="loginAdmin()">Ingresar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════ ADMIN PANEL ══════════════ -->
-<div id="view-admin" class="view-wide">
-  <div class="flex justify-between items-center" style="margin-bottom:1.1rem;flex-wrap:wrap;gap:0.5rem">
-    <h2 style="font-size:1.4rem">Panel de administración</h2>
-    <button class="btn btn-outline btn-sm" onclick="logoutAdmin()">← Salir</button>
-  </div>
-
-  <div class="stat-grid">
-    <div class="stat-card"><div class="stat-num" id="stat-total">—</div><div class="stat-label">Total</div></div>
-    <div class="stat-card"><div class="stat-num" id="stat-pend" style="color:#b45309">—</div><div class="stat-label">Pendientes</div></div>
-    <div class="stat-card"><div class="stat-num" id="stat-aprov" style="color:#1D6B5A">—</div><div class="stat-label">Aprobados</div></div>
-    <div class="stat-card"><div class="stat-num" id="stat-present" style="color:#1e40af">—</div><div class="stat-label">Presentes</div></div>
-  </div>
-
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="showAdminTab('tab-reg',this)">📋 Registros</button>
-    <button class="tab-btn" onclick="showAdminTab('tab-scan',this)">📷 Escáner</button>
-    <button class="tab-btn" onclick="showAdminTab('tab-cfg',this)">⚙ Configuración</button>
-  </div>
-
-  <!-- TAB REGISTROS -->
-  <div id="tab-reg">
-    <div class="card" style="padding:1rem">
-      <div class="flex justify-between items-center" style="margin-bottom:0.875rem;flex-wrap:wrap;gap:0.5rem">
-        <h3 style="font-size:1rem">Listado de registros</h3>
-        <div class="flex gap-2">
-          <select id="filtro-estado" onchange="cargarRegistros()" style="padding:0.38rem 0.7rem;border:1px solid var(--border);border-radius:6px;font-family:var(--font);font-size:0.8rem">
-            <option value="">Todos</option>
-            <option value="pendiente">Pendientes</option>
-            <option value="aprobado">Aprobados</option>
-            <option value="presente">Presentes</option>
-            <option value="rechazado">Rechazados</option>
-          </select>
-          <button class="btn btn-outline btn-sm" onclick="cargarRegistros()">↻</button>
-        </div>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Nombre</th><th>Correo</th><th>CI</th><th>Ciudad</th><th>Comprobante</th><th>Estado</th><th>Acciones</th></tr>
-          </thead>
-          <tbody id="tabla-registros">
-            <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">Cargando...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- TAB SCANNER -->
-  <div id="tab-scan" class="hidden">
-    <div class="card">
-      <h3 style="margin-bottom:0.4rem">Escáner QR — Día del evento</h3>
-      <p class="text-muted" style="margin-bottom:1rem;font-size:0.875rem">Solo personas con pago <strong>aprobado</strong> pueden ingresar. Los pendientes quedarán en rojo.</p>
-      <div class="scanner-box">
-        <video id="scanner-video" autoplay playsinline muted style="display:none"></video>
-        <div id="scanner-idle">
-          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#b08060" stroke-width="1.5" style="margin:0 auto 0.65rem;display:block"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
-          <p class="text-muted" style="margin-bottom:0.875rem;font-size:0.875rem">Activa la cámara para escanear QR</p>
-          <button class="btn btn-primary" onclick="startScanner()">Activar cámara</button>
-        </div>
-        <button class="btn btn-outline btn-sm hidden" id="btn-stop" style="margin-top:0.65rem" onclick="stopScanner()">■ Detener</button>
-        <div class="scan-result" id="scan-result"></div>
-      </div>
-      <hr class="divider">
-      <p class="text-muted" style="font-size:0.85rem;margin-bottom:0.65rem">O ingresa el ID manualmente:</p>
-      <div class="flex gap-2">
-        <input type="text" id="manual-code" placeholder="UUID del registro" style="flex:1;padding:0.6rem 0.85rem;border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:0.9rem">
-        <button class="btn btn-success" onclick="marcarPresente(document.getElementById('manual-code').value.trim())">Marcar presente</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- TAB CONFIG -->
-  <div id="tab-cfg" class="hidden">
-    <div class="card">
-      <h3 style="margin-bottom:1rem">Configuración</h3>
-
-      <div class="field"><label>Nombre del evento</label><input type="text" id="cfg-nombre" placeholder="Gran Evento 2025"></div>
-      <div class="field-row">
-        <div class="field"><label>Monto inscripción (Bs.)</label><input type="number" id="cfg-monto" value="100"></div>
-        <div class="field"><label>Banco / Titular</label><input type="text" id="cfg-banco" placeholder="Banco X — Juan Pérez"></div>
-      </div>
-      <div class="field">
-        <label>Imagen QR de pago (tu QR bancario)</label>
-        <div class="upload-area" onclick="document.getElementById('cfg-qr-file').click()">
-          <input type="file" id="cfg-qr-file" accept="image/*" onchange="cargarQRPago(event)">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b08060" stroke-width="1.5" style="margin:0 auto 0.4rem;display:block"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3"/></svg>
-          <p style="font-size:0.8rem;color:var(--muted)">Click para cargar tu QR de pago bancario</p>
-        </div>
-        <div id="qr-pay-preview" style="margin-top:0.65rem;display:none;text-align:center">
-          <img id="qr-pay-thumb" src="" style="max-width:110px;border-radius:8px;border:2px solid var(--border)">
-          <p style="font-size:0.75rem;color:var(--accent);margin-top:0.3rem">✓ QR de pago cargado</p>
-        </div>
-      </div>
-
-
-
-      <div class="cfg-section">
-        <div class="field"><label>Contraseña del panel admin</label><input type="text" id="cfg-password" value="admin123"></div>
-      </div>
-
-      <button class="btn btn-primary" onclick="guardarConfig()" style="margin-top:0.5rem">💾 Guardar configuración</button>
-      <div class="alert alert-success hidden mt-2" id="cfg-ok">✓ Configuración guardada</div>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL QR -->
-<div class="modal-overlay hidden" id="modal-overlay" onclick="if(event.target===this)closeModal()">
-  <div class="modal-box">
-    <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;margin-bottom:0.3rem" id="modal-title"></h3>
-    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem" id="modal-sub"></p>
-    <div id="modal-body"></div>
-    <div class="flex gap-2 mt-3" id="modal-footer"></div>
-  </div>
-</div>
-
-<script>
-// ─── CONFIG ───────────────────────────────────────────
-const SUPABASE_URL = 'https://ksjhmffcbsbilluspwvp.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_LheV41B97hnmP7_sDDKoYQ_2maPPBv0';
-
-
-let CONFIG = {
-  monto: 100, banco: '', nombreEvento: 'Evento',
-  qrPayImg: '', password: 'admin123'
+const EXAMS = {
+  "2-primaria": {
+    "Lenguaje": [
+      ["¿En cuál de las siguientes opciones TODAS las letras son vocales?", ["a, e, p, u", "e, i, o, u", "a, o, m, e"], 1],
+      ["Si dividimos correctamente en sílabas la palabra \"mariposa\" (ma-ri-po-sa), ¿cuántas sílabas tiene?", ["3 sílabas", "4 sílabas", "5 sílabas"], 1],
+      ["Identifica la vocal con la que inicia la palabra \"Avión\" y la letra final de la palabra \"Helado\":", ["Inicia con A, termina con O", "Inicia con E, termina con A", "Inicia con I, termina con O"], 0],
+      ["¿Cuál de las siguientes sílabas falta para completar la palabra del animal saltarín: \"Ra - ____ - na\"?", ["ta", "to", "te"], 0],
+      ["¿Qué sonido exacto se forma al unir la consonante \"m\" con las vocales \"o\" y \"a\" en ese orden?", ["mo - ma", "me - mo", "ma - mo"], 0],
+      ["¿Cuántas letras en total tiene la palabra \"sol\" y cuántas vocales contiene?", ["3 letras y 2 vocales", "3 letras y 1 vocal", "4 letras y 1 vocal"], 1],
+      ["Selecciona la opción que contiene únicamente palabras de 3 sílabas (trisílabas):", ["sol, perro, pan", "caracol, estrella, camisa", "mariposa, helicóptero, luz"], 1],
+      ["Marca la palabra que comience con la consonante \"s\" y termine con la vocal \"a\":", ["Sombrero", "Sopa", "Sol"], 1],
+      ["¿Cuál es el artículo determinado que corresponde a la palabra \"manzana\"?", ["El manzana", "La manzana", "Los manzana"], 1],
+      ["De acuerdo con la regla de uso de mayúsculas en nombres propios, ¿cómo debe escribirse el nombre de una persona?", ["juan (todo minúscula)", "JUAN (todo mayúscula)", "Juan (primera letra mayúscula)"], 2],
+      ["¿Cuál es la regla correcta para formar el plural de las palabras que terminan en \"z\", como \"lápiz\"?", ["Se cambia la Z por C y se agrega \"es\" (lápices)", "Se mantiene la Z y se agrega \"s\" (lápizs)", "Se escribe con Z y \"es\" (lápizes)"], 0],
+      ["La letra \"H\" es muda en español. Identifica la palabra redactada correctamente con \"H\":", ["elado", "helado", "eladoh"], 1],
+      ["Observa la frase: \"¿Cuál es tu animal favorito?\". ¿Qué signos se usan para realizar preguntas?", ["Signos de admiración ( ¡ ! )", "Signos de interrogación ( ¿ ? )", "Punto y coma ( ; )"], 1],
+      ["Distingue la palabra que está escrita con la ortografía correcta:", ["Vaca (con V)", "Baka (con B y K)", "Vaka (con V y K)"], 0],
+      ["¿Qué signo ortográfico es obligatorio colocar al finalizar toda oración?", ["Una coma ( , )", "Un punto ( . )", "Un guión ( - )"], 1],
+      ["¿Por qué se dice que la letra \"H\" es una letra especial en el idioma español?", ["Porque suena como la letra S", "Porque es una letra muda (no tiene sonido propio)", "Porque siempre se escribe al final de las palabras"], 1],
+      ["Dos palabras riman cuando terminan con el mismo sonido. ¿Cuál rima con \"gato\"?", ["Pato", "Perro", "Ratón"], 0],
+      ["Lee la oración: \"El perro corre en el parque\". ¿Quién es el sujeto que realiza la acción de correr?", ["corre", "el parque", "El perro"], 2],
+      ["Los antónimos son palabras con significados opuestos. ¿Cuál es el antónimo de la palabra \"día\"?", ["Sol", "Noche", "Luz"], 1],
+      ["¿Cuál es la forma en femenino de la palabra \"león\"?", ["Leona", "Leoncita", "Leonera"], 0],
+      ["Una sílaba trabada se compone de dos consonantes seguidas de una vocal. Encuentra la palabra con sílaba trabada:", ["Flor (fl)", "Mesa (m)", "Cama (c)"], 0],
+      ["Los sinónimos son palabras que significan lo mismo. ¿Cuál es el sinónimo de la palabra \"pequeño\"?", ["Grande", "Chico", "Alto"], 1],
+      ["Si completas \"_ato\" con la consonante \"g\", obtienes \"gato\". ¿Qué animal se forma si la completas con \"p\"?", ["Rato", "Pato", "Mato"], 1],
+      ["Clasificación semántica: ¿Cuál de las siguientes palabras corresponde a la categoría de un COLOR?", ["Dulce", "Rojo", "Salado"], 1],
+      ["Encuentra la pareja de palabras que tienen rima consonante perfecta al terminar en \"-ón\":", ["Camión y Avión", "Camión y Casa", "Camión y Flor"], 0],
+    ]
+  },
+  "olimpiadas": {
+    "Ciencias Sociales": [
+      ["La conquista española provocó grandes cambios en la vida de los pueblos originarios.", ["Verdadero", "Falso"], 0],
+      ["Durante la época colonial, todos los grupos sociales tenían los mismos derechos.", ["Verdadero", "Falso"], 1],
+      ["Los pueblos indígenas realizaron diferentes rebeliones contra el dominio colonial.", ["Verdadero", "Falso"], 0],
+      ["La independencia del Alto Perú se logró de un día para otro y sin luchas.", ["Verdadero", "Falso"], 1],
+      ["La Guerra del Acre estuvo relacionada con la disputa por un territorio rico en recursos naturales, especialmente la goma.", ["Verdadero", "Falso"], 0],
+      ["¿Qué ocurrió el 6 de agosto de 1825?", ["Se fundó la ciudad de La Paz", "Se declaró la independencia y nació Bolivia como país libre y soberano", "Se firmó un tratado de paz con España", "Se eligió al primer presidente"], 1],
+      ["¿Cuál fue una de las funciones de la Primera Asamblea Constituyente?", ["Organizar el nuevo país", "Iniciar la conquista española", "Declarar la Guerra del Pacífico", "Entregar el territorio del Acre"], 0],
+      ["¿Cómo se llamó inicialmente nuestro país después de su independencia?", ["Estado del Alto Perú", "República de Bolívar", "República del Acre", "Nueva España"], 1],
+      ["¿Qué documento declaró oficialmente la independencia del nuevo país?", ["La Constitución Política", "El Acta de la Independencia", "El Tratado de Paz", "El Diario de Guerra"], 1],
+      ["¿Quién fue el primer presidente de Bolivia?", ["Antonio José de Sucre", "Simón Bolívar", "Andrés de Santa Cruz", "Túpac Katari"], 0],
+      ["¿Qué país ocupó el Litoral boliviano durante la Guerra del Pacífico?", ["Argentina", "Brasil", "Chile", "Perú"], 2],
+      ["Bolivia nació como país independiente en el año 1825.", ["Verdadero", "Falso"], 0],
+      ["Al inicio de la República, Bolivia tenía un territorio más extenso que el actual.", ["Verdadero", "Falso"], 0],
+      ["La organización política de la República permitió establecer autoridades e instituciones para gobernar el país.", ["Verdadero", "Falso"], 0],
+      ["En la época republicana, todas las personas tenían inmediatamente los mismos derechos y oportunidades.", ["Verdadero", "Falso"], 1],
+      ["La Guerra del Pacífico ocasionó que Bolivia perdiera su salida soberana al océano Pacífico.", ["Verdadero", "Falso"], 0],
+      ["¿Qué son los gobiernos autónomos departamentales?", ["Una institución que gobierna todo el país", "Una institución que ejerce autoridad en un departamento", "Una organización que administra empresas privadas", "Un grupo elegido para el congreso nacional"], 1],
+      ["¿De qué se encargan los gobiernos autónomos departamentales?", ["De las relaciones internacionales", "De la administración de cada departamento y municipio", "De la defensa militar del territorio", "De la educación universitaria"], 1],
+      ["¿Por qué los gobiernos departamentales son autónomos?", ["Porque no dependen de ninguna ley", "Porque cada departamento administra sus recursos económicos", "Porque eligen a su propio presidente", "Porque no pertenecen a Bolivia"], 1],
+      ["¿Quién es el Gobernador actual de Cochabamba?", ["Evo Morales", "Leonardo Loza", "Luis Arce", "Manfred Reyes Villa"], 1],
+      ["¿Qué son los recursos naturales?", ["Los productos fabricados en industrias", "Las riquezas que nos brinda la naturaleza", "Los bienes importados de otros países", "Las herramientas de trabajo agrícola"], 1],
+      ["¿Cómo se clasifican los recursos naturales?", ["Grandes, medianos y pequeños", "Permanentes, renovables y no renovables", "Animales, vegetales y minerales", "Primarios y secundarios"], 1],
+      ["¿Cuáles son recursos permanentes?", ["Las plantas y los animales", "Los minerales y los hidrocarburos", "El suelo, el agua, el aire y la energía solar", "La madera y el papel"], 2],
+      ["¿Cuáles son ejemplos de recursos naturales renovables?", ["Los minerales y los hidrocarburos", "Las plantas y los animales", "El petróleo y el gas", "El oro y la plata"], 1],
+      ["¿Cuáles son ejemplos de recursos naturales no renovables?", ["Las plantas y los animales", "El suelo y el agua", "Los minerales y los hidrocarburos", "La energía solar y el aire"], 2],
+      ["¿Qué es el desarrollo sostenible?", ["Construir más fábricas rápidamente", "Cuidar los recursos naturales para la población actual y futura", "Explotar todos los recursos lo más rápido posible", "Importar recursos de otros países"], 1],
+      ["¿Cómo se clasifican las actividades económicas?", ["Fáciles y difíciles", "Primarias, secundarias y terciarias", "Grandes y pequeñas", "Urbanas y rurales"], 1],
+      ["¿Cuál de estas es una actividad económica primaria?", ["La fabricación de automóviles", "El turismo", "La agricultura", "El comercio en tiendas"], 2],
+      ["¿En qué consiste la agricultura?", ["En la crianza de animales", "En el laboreo de los campos de cultivo", "En la extracción de minerales", "En la venta de productos"], 1],
+      ["¿Qué mineral se produce en mayor cantidad en Bolivia?", ["El oro", "La plata", "El zinc", "El estaño"], 2],
+      ["¿Qué fecha se recuerda como Día del Estado Plurinacional de Bolivia?", ["6 de agosto", "22 de enero", "1 de mayo", "25 de diciembre"], 1],
+      ["¿Qué fecha se recuerda como Día del Mar?", ["12 de abril", "23 de marzo", "19 de marzo", "1 de mayo"], 1],
+      ["¿Qué fecha se recuerda como Día del Niño en Bolivia?", ["25 de diciembre", "1 de junio", "12 de abril", "21 de septiembre"], 2],
+      ["¿Qué fecha se recuerda como Día del Trabajo?", ["6 de agosto", "23 de marzo", "1 de mayo", "22 de enero"], 2],
+      ["¿Qué fecha se recuerda como Día de la Madre en Bolivia?", ["8 de marzo", "27 de mayo", "12 de abril", "1 de mayo"], 1],
+      ["¿Qué fecha se recuerda como Día del Maestro?", ["6 de junio", "6 de agosto", "21 de septiembre", "27 de mayo"], 0],
+      ["¿Qué fecha se recuerda como Día de la Patria?", ["22 de enero", "23 de marzo", "6 de agosto", "17 de agosto"], 2],
+      ["¿Qué fecha se recuerda como Día de la Bandera boliviana?", ["6 de agosto", "17 de agosto", "21 de septiembre", "22 de enero"], 1],
+      ["¿Qué fecha se recuerda como Día del Estudiante?", ["12 de abril", "6 de junio", "21 de septiembre", "27 de mayo"], 2],
+      ["¿Qué fecha se recuerda como Día del Padre?", ["19 de marzo", "27 de mayo", "6 de junio", "1 de mayo"], 0],
+      ["¿Cuáles son danzas folklóricas de Cochabamba?", ["Morenada, Diablada y Tinku", "Caporales, Cueca cochabambina y Salaque", "Saya, Tobas y Kullawada", "Waca Waca, Llamerada y Pujllay"], 1],
+      ["¿Bolivia solo tiene una danza folklórica?", ["Sí, solo tiene una danza nacional", "No, Bolivia tiene muchas danzas según cada región", "Sí, la Cueca es la única", "No tiene danzas propias"], 1],
+      ["¿Cuáles son costumbres y tradiciones de Bolivia?", ["Halloween, Navidad y Año Nuevo", "Todos Santos, la Ch'alla y el Carnaval de Oruro", "Día de Acción de Gracias y San Valentín", "Oktoberfest y Pascua"], 1],
+      ["¿Cuántas banderas ha tenido Bolivia a lo largo de su historia?", ["1 bandera", "2 banderas", "3 banderas", "4 banderas"], 2],
+      ["¿Cuántas estrellas tenía el primer Escudo de Bolivia?", ["9 estrellas", "5 estrellas", "3 estrellas", "7 estrellas"], 1],
+      ["¿Cuáles son las flores nacionales de Bolivia?", ["La rosa y el clavel", "La kantuta y el patujú", "La orquídea y el girasol", "El jazmín y la violeta"], 1],
+      ["¿En qué año fue promulgada la actual Constitución Política del Estado boliviano?", ["2005", "2009", "2015", "2000"], 1],
+      ["¿Cuántos artículos contiene la actual Constitución Política del Estado boliviano?", ["200 artículos", "300 artículos", "411 artículos", "500 artículos"], 2],
+    ],
+    "Lenguaje": [
+      ["¿Qué es la comunicación?", ["Una forma de jugar", "El proceso de transmitir y recibir información", "Una forma de escribir solamente", "Un tipo de dibujo"], 1],
+      ["¿Cuál es un elemento importante de la comunicación?", ["Emisor", "Cuaderno", "Regla", "Recreo"], 0],
+      ["¿Qué es el lenguaje?", ["Un medio que utilizamos para comunicarnos y expresar ideas", "Un juego de palabras", "Una materia de matemática", "Un instrumento musical"], 0],
+      ["La comunicación verbal se realiza principalmente mediante:", ["Dibujos", "Palabras orales o escritas", "Señales de tránsito solamente", "Gestos únicamente"], 1],
+      ["¿Qué permitió la comunicación escrita?", ["Guardar y transmitir información a través del tiempo", "Solamente dibujar", "Hablar más fuerte", "Jugar con letras"], 0],
+      ["Una de las primeras formas de escritura fue:", ["La escritura mediante dibujos y símbolos", "Los mensajes de celular", "El periódico", "El libro digital"], 0],
+      ["¿Qué es un diario personal o íntimo?", ["Un periódico que leen todas las personas", "Un escrito donde una persona expresa sus experiencias y sentimientos", "Un libro de matemáticas", "Una carta comercial"], 1],
+      ["¿Cuál de las siguientes palabras lleva tilde correctamente?", ["arbol", "lapiz", "fácilmente", "dificil"], 2],
+      ["¿Qué invento permitió producir muchos libros y textos con mayor rapidez?", ["La imprenta", "El teléfono", "La televisión", "La radio"], 0],
+      ["¿Cuál es la función principal de un periódico o diario?", ["Informar sobre acontecimientos y hechos", "Enseñar solamente matemáticas", "Contar únicamente cuentos", "Vender juguetes"], 0],
+      ["¿Qué es la poesía?", ["Una forma de expresión artística mediante palabras", "Una noticia del periódico", "Una carta personal", "Una regla ortográfica"], 0],
+      ["El lenguaje literario se caracteriza por:", ["Ser creativo y expresivo", "Usar solamente números", "No expresar sentimientos", "Dar únicamente órdenes"], 0],
+      ["¿Qué significa declamar?", ["Leer rápidamente sin comprender", "Expresar un poema con emoción, entonación y gestos", "Copiar un texto", "Escribir una noticia"], 1],
+      ["La comunicación permite transmitir ideas, sentimientos e información.", ["Verdadero", "Falso"], 0],
+      ["La comunicación verbal utiliza únicamente gestos y movimientos.", ["Verdadero", "Falso"], 1],
+      ["La escritura ayudó a conservar conocimientos y acontecimientos importantes.", ["Verdadero", "Falso"], 0],
+      ["La imprenta permitió la difusión de libros, periódicos y otros textos.", ["Verdadero", "Falso"], 0],
+      ["Un diario personal puede contener experiencias y sentimientos de una persona.", ["Verdadero", "Falso"], 0],
+      ["¿Cómo se llama la persona que envía un mensaje en la comunicación?", ["Receptor", "Emisor", "Canal", "Código"], 1],
+      ["¿Cómo se llama la persona que recibe el mensaje?", ["Emisor", "Receptor", "Mensaje", "Contexto"], 1],
+      ["¿Cuáles son los componentes básicos de la comunicación?", ["Solo emisor y receptor", "Emisor, receptor, mensaje, código, canal y contexto", "Solo mensaje y canal", "Emisor y código"], 1],
+      ["¿Qué es la abreviatura?", ["Una palabra larga", "El acortamiento en la escritura de una palabra", "Un sinónimo", "Un tipo de oración"], 1],
+      ["¿Qué es la sigla?", ["Una palabra compuesta", "Cada una de las letras iniciales de un grupo de palabras", "Un tipo de verbo", "Una oración completa"], 1],
+      ["¿Qué es la narración?", ["Una ecuación matemática", "El relato de hechos vividos o imaginados por una o varias personas", "Un tipo de dibujo", "Una regla ortográfica"], 1],
+      ["¿Cuáles son los cinco elementos de la narración?", ["Título, autor, fecha, lugar y hora", "Narrador, acciones, personajes, espacio y tiempo", "Inicio, medio, fin, autor y lector", "Sujeto, verbo, predicado, adjetivo y adverbio"], 1],
+      ["¿Cuál es la estructura del cuento?", ["Inicio y final", "Introducción, nudo y desenlace", "Título, cuerpo y firma", "Saludo, desarrollo y despedida"], 1],
+      ["¿Qué es el punto?", ["Un signo que separa palabras", "Un signo de puntuación que sirve para terminar una frase de sentido completo", "Un signo que indica pregunta", "Un adorno en la escritura"], 1],
+      ["¿Qué son las narraciones ancestrales?", ["Noticias recientes de la televisión", "Narraciones antiguas difundidas a través del tiempo", "Historias inventadas ayer", "Informes científicos modernos"], 1],
+      ["¿Qué es la leyenda?", ["Un poema moderno", "Narraciones transmitidas de generación en generación", "Una noticia del periódico", "Un informe escolar"], 1],
+      ["En la oración: \"Manuel está feliz\". ¿Qué pronombre sustituye a Manuel?", ["Yo", "Ella", "Él", "Nosotros"], 2],
+      ["¿Qué artículo va delante de \"auto\"?", ["La", "El", "Los", "Las"], 1],
+      ["¿Cuáles son los dos tipos de artículos?", ["Grandes y pequeños", "Artículos definidos y artículos indefinidos", "Artículos largos y cortos", "Artículos simples y compuestos"], 1],
+      ["¿Para qué sirve la coma?", ["Para terminar un texto", "Para hacer pequeñas pausas al leer un texto", "Para indicar una pregunta", "Para separar párrafos"], 1],
+      ["¿Cuáles son las partes de una exposición?", ["Solo introducción y conclusión", "Introducción, desarrollo, conclusión y plenario", "Título y cuerpo", "Saludo y despedida"], 1],
+      ["¿Cuál es el verbo en la siguiente oración: \"Los niños corren en el recreo\"?", ["niños", "recreo", "corren", "Los"], 2],
+      ["¿Qué es un comunicado?", ["Un poema artístico", "Un informe que comunica información para conocimiento público", "Una carta personal", "Un cuento de hadas"], 1],
+      ["¿Cuál es la diferencia entre publicidad y propaganda?", ["Son exactamente lo mismo", "La publicidad busca vender un producto, la propaganda busca influir en la actitud de la comunidad", "La publicidad es oral y la propaganda es escrita", "No existe diferencia alguna"], 1],
+      ["¿Qué es un debate?", ["Una pelea entre personas", "Una discusión planificada y argumentativa", "Un monólogo individual", "Un tipo de cuento"], 1],
+      ["¿Quiénes participan en un debate?", ["Solo el público", "El moderador y los participantes", "Solo una persona", "El escritor y el lector"], 1],
+      ["¿Qué es el método Cornell?", ["Un tipo de examen", "Una técnica para tomar apuntes", "Un deporte", "Una forma de dibujar"], 1],
+      ["¿Para qué sirve el mapa conceptual?", ["Para dibujar paisajes", "Para comprender un tema usando información visual y organizada", "Para escribir cartas", "Para hacer cálculos matemáticos"], 1],
+      ["¿Cuáles son las partes reconocidas de una carta?", ["Solo saludo y despedida", "Fecha, destinatario, cargo, lugar, referencia, saludo, desarrollo, despedida y firma", "Solo el mensaje", "Título y autor"], 1],
+      ["¿Cuándo se escribe con mayúscula?", ["Solo al inicio de un texto", "La primera letra de un escrito, después de punto, nombres propios y al iniciar citas textuales", "Nunca se usa mayúscula", "Solo en nombres de ciudades"], 1],
+      ["¿Cuáles son las partes de una receta de cocina?", ["Solo los ingredientes", "Nombre del plato, tiempo de preparación, ingredientes e instrucciones", "Solo el nombre del plato", "Título y firma del chef"], 1],
+    ]
+  }
 };
 
-function loadConfig() {
-  try { const s = localStorage.getItem('evt_cfg'); if (s) CONFIG = {...CONFIG,...JSON.parse(s)}; } catch(e){}
-  applyConfig();
-}
-function applyConfig() {
-  const $v = (id,val) => { const el=document.getElementById(id); if(el&&val!==undefined&&val!=='') el.value=val; };
-  const $t = (id,val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
-  $t('monto-display', `Bs. ${CONFIG.monto}`);
-  $t('banco-display', CONFIG.banco||'Cuenta del evento');
-  $t('nav-brand', `🎟 ${CONFIG.nombreEvento||'Evento'}`);
-  $v('cfg-nombre',CONFIG.nombreEvento); $v('cfg-monto',CONFIG.monto);
-  $v('cfg-banco',CONFIG.banco); $v('cfg-password',CONFIG.password);
-  if (CONFIG.qrPayImg) {
-    const img=document.getElementById('qr-pay-img'), ph=document.getElementById('qr-pay-ph');
-    if(img&&ph){img.src=CONFIG.qrPayImg;img.style.display='block';ph.style.display='none';}
-    const thumb=document.getElementById('qr-pay-thumb'), prev=document.getElementById('qr-pay-preview');
-    if(thumb&&prev){thumb.src=CONFIG.qrPayImg;prev.style.display='block';}
+const COURSES = [
+  { id: "2-primaria", label: "2° de Primaria" },
+  { id: "olimpiadas", label: "4° de Primaria" },
+];
+
+/* ──────────── HELPERS ──────────── */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
   }
-}
-function guardarConfig() {
-  CONFIG.nombreEvento = document.getElementById('cfg-nombre').value||'Evento';
-  CONFIG.monto        = document.getElementById('cfg-monto').value||100;
-  CONFIG.banco        = document.getElementById('cfg-banco').value||'';
-  CONFIG.password     = document.getElementById('cfg-password').value||'admin123';
-  localStorage.setItem('evt_cfg', JSON.stringify(CONFIG));
-  applyConfig();
-  const ok=document.getElementById('cfg-ok'); ok.classList.remove('hidden');
-  setTimeout(()=>ok.classList.add('hidden'),2500);
-}
-function cargarQRPago(e) {
-  const f=e.target.files[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=ev=>{CONFIG.qrPayImg=ev.target.result;localStorage.setItem('evt_cfg',JSON.stringify(CONFIG));applyConfig();};
-  r.readAsDataURL(f);
+  return a;
 }
 
-// ─── SUPABASE helper ──────────────────────────────────
-async function sb(path, opts={}) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type': 'application/json',
-      'Prefer': opts.prefer || 'return=representation',
-      ...opts.headers
-    }, ...opts
-  });
-  if (!res.ok) { const e=await res.text(); throw new Error(e); }
-  const t=await res.text(); return t?JSON.parse(t):null;
-}
-
-// ─── VISTAS// ─── VISTAS ───────────────────────────────────────────
-let adminLoggedIn = false;
-function showView(v) {
-  document.querySelectorAll('.view,.view-wide').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
-  if (v==='admin') {
-    document.getElementById('view-admin').classList.add('active');
-    cargarRegistros(); actualizarStats();
-  } else if (v==='admin-login') {
-    document.getElementById('view-admin-login').classList.add('active');
-    document.querySelectorAll('.nav-tab')[1].classList.add('active');
-  } else {
-    document.getElementById('view-registro').classList.add('active');
-    document.querySelectorAll('.nav-tab')[0].classList.add('active');
-  }
-}
-function showAdminTab(id, btn) {
-  ['tab-reg','tab-scan','tab-cfg'].forEach(t=>document.getElementById(t).classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  if (id==='tab-reg') cargarRegistros();
-}
-function switchLookupTab(tab) {
-  const isNuevo = tab==='nuevo';
-  document.getElementById('panel-nuevo').classList.toggle('hidden',!isNuevo);
-  document.getElementById('panel-consulta').classList.toggle('hidden',isNuevo);
-  document.getElementById('ltab-nuevo').classList.toggle('active',isNuevo);
-  document.getElementById('ltab-consulta').classList.toggle('active',!isNuevo);
-}
-function loginAdmin() {
-  if (document.getElementById('admin-pass').value===CONFIG.password) {
-    adminLoggedIn=true;
-    document.getElementById('err-login').classList.add('hidden');
-    showView('admin');
-  } else {
-    document.getElementById('err-login').classList.remove('hidden');
-  }
-}
-function logoutAdmin() { adminLoggedIn=false; showView('registro'); }
-
-// ─── REGISTRO ─────────────────────────────────────────
-let imgB64='';
-function previewImg(e) {
-  const f=e.target.files[0]; if(!f) return;
-  document.getElementById('img-name').textContent='✓ '+f.name;
-  const r=new FileReader(); r.onload=ev=>imgB64=ev.target.result; r.readAsDataURL(f);
-}
-function irPaso2() {
-  const n=document.getElementById('reg-nombre').value.trim();
-  const a=document.getElementById('reg-apellido').value.trim();
-  const c=document.getElementById('reg-correo').value.trim();
-  const t=document.getElementById('reg-telefono').value.trim();
-  const ci=document.getElementById('reg-ci').value.trim();
-  const ci2=document.getElementById('reg-ciudad').value;
-  const errG=document.getElementById('err-form-gen');
-  document.getElementById('err-correo-dup').style.display='none';
-  if(!n||!a||!c||!t||!ci||!ci2){errG.textContent='Por favor completa todos los campos.';errG.classList.remove('hidden');return;}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c)){errG.textContent='Ingresa un correo válido.';errG.classList.remove('hidden');return;}
-  errG.classList.add('hidden');
-  document.getElementById('paso1').classList.add('hidden');
-  document.getElementById('paso2').classList.remove('hidden');
-  setStep(2);
-}
-function irPaso1() {
-  document.getElementById('paso2').classList.add('hidden');
-  document.getElementById('paso1').classList.remove('hidden');
-  setStep(1);
-}
-function setStep(n) {
-  ['step1-ind','step2-ind','step3-ind'].forEach((id,i)=>{
-    const el=document.getElementById(id);
-    el.classList.remove('active','done');
-    if(i+1<n) el.classList.add('done');
-    else if(i+1===n) el.classList.add('active');
+function prepareQuestions(raw) {
+  return shuffle(raw).map(([q, opts, correct]) => {
+    const correctText = opts[correct];
+    const shuffled = shuffle(opts.map((o, i) => ({ text: o, orig: i })));
+    return {
+      question: q,
+      options: shuffled.map(s => s.text),
+      correctIndex: shuffled.findIndex(s => s.text === correctText),
+    };
   });
 }
 
-async function enviarRegistro() {
-  const btn=document.getElementById('btn-enviar');
-  btn.disabled=true; btn.innerHTML='<span class="loader"></span> Enviando...';
-  const nombre=document.getElementById('reg-nombre').value.trim()+' '+document.getElementById('reg-apellido').value.trim();
-  const correo=document.getElementById('reg-correo').value.trim();
-  const telefono=document.getElementById('reg-telefono').value.trim();
-  const ci=document.getElementById('reg-ci').value.trim();
-  const ciudad=document.getElementById('reg-ciudad').value;
-  const comprobante=document.getElementById('reg-comprobante').value.trim();
-  try {
-    // Verificar duplicado
-    const existing=await sb(`registros?correo=eq.${encodeURIComponent(correo)}&select=id,estado`);
-    if(existing&&existing.length>0){
-      document.getElementById('err-correo-dup').style.display='block';
-      irPaso1(); btn.disabled=false; btn.innerHTML='Enviar registro'; return;
-    }
-    const res=await sb('registros',{
-      method:'POST',
-      body:JSON.stringify({nombre,correo,telefono,ci_dni:ci,ciudad,
-        comprobante_ref:comprobante,comprobante_img:imgB64||null,estado:'pendiente'}),
-      prefer:'return=representation'
-    });
-    // Pre-llenar correo en el lookup
-    document.getElementById('lookup-correo-p3').value=correo;
-    document.getElementById('paso2').classList.add('hidden');
-    document.getElementById('paso3').classList.remove('hidden');
-    document.getElementById('p3-pendiente').classList.remove('hidden');
-    setStep(3);
-  } catch(e) {
-    alert('Error al registrar: '+e.message);
-    btn.disabled=false; btn.innerHTML='Enviar registro';
-  }
-}
+/* ──────────── STYLES ──────────── */
+const palette = {
+  bg: "#F0F4FF",
+  card: "#FFFFFF",
+  primary: "#4F46E5",
+  primaryLight: "#E0E7FF",
+  primaryDark: "#3730A3",
+  correct: "#16A34A",
+  correctBg: "#DCFCE7",
+  wrong: "#DC2626",
+  wrongBg: "#FEE2E2",
+  text: "#1E293B",
+  muted: "#64748B",
+  border: "#CBD5E1",
+  accent: "#F59E0B",
+  accentBg: "#FEF3C7",
+};
 
-function resetForm() {
-  ['reg-nombre','reg-apellido','reg-correo','reg-telefono','reg-ci','reg-comprobante'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('reg-ciudad').value='';
-  document.getElementById('paso3').classList.add('hidden');
-  document.getElementById('paso1').classList.remove('hidden');
-  document.getElementById('paso2').classList.add('hidden');
-  document.getElementById('err-correo-dup').style.display='none';
-  imgB64=''; setStep(1);
-}
+export default function QuizApp() {
+  const [screen, setScreen] = useState("start");
+  const [courseId, setCourseId] = useState("");
+  const [subject, setSubject] = useState("");
+  const [questions, setQuestions] = useState([]);
+  const [current, setCurrent] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [submitted, setSubmitted] = useState(false);
 
-// ─── LOOKUP QR ────────────────────────────────────────
-async function lookupQR(inputId, resultId, qrBoxId) {
-  const correo=document.getElementById(inputId).value.trim();
-  if(!correo){alert('Ingresa tu correo');return;}
-  const resEl=document.getElementById(resultId);
-  const qrBox=document.getElementById(qrBoxId);
-  resEl.innerHTML='<div style="font-size:.85rem;color:var(--muted)">Consultando...</div>';
-  qrBox.innerHTML='';
-  try {
-    const data=await sb(`registros?correo=eq.${encodeURIComponent(correo)}&select=*`);
-    if(!data||data.length===0){
-      resEl.innerHTML='<div style="padding:.65rem .875rem;background:#fef2f2;color:#991b1b;border:1px solid #fca5a5;border-radius:8px;font-size:.875rem">❌ No se encontró ningún registro con ese correo.</div>';
-      return;
-    }
-    const r=data[0];
-    if(r.estado==='pendiente'){
-      resEl.innerHTML='<div style="padding:.65rem .875rem;background:#fef9ec;color:#b45309;border:1px solid #fde68a;border-radius:8px;font-size:.875rem">⏳ Tu pago está <strong>pendiente de verificación</strong>. Cuando sea aprobado podrás ver tu QR en la pestaña "Ya me registré".</div>';
-      return;
-    }
-    if(r.estado==='rechazado'){
-      resEl.innerHTML='<div style="padding:.65rem .875rem;background:#fef2f2;color:#991b1b;border:1px solid #fca5a5;border-radius:8px;font-size:.875rem">🚫 Tu registro fue rechazado. Contacta al organizador.</div>';
-      return;
-    }
-    if(r.estado==='aprobado'||r.estado==='presente'){
-      resEl.innerHTML=`<div style="padding:.65rem .875rem;background:#f0faf7;color:#1D6B5A;border:1px solid #a7f3d0;border-radius:8px;font-size:.875rem">✅ <strong>${r.nombre}</strong> — Registro aprobado. Este es tu QR de acceso:</div>`;
-      qrBox.innerHTML='';
-      setTimeout(()=>{
-        new QRCode(qrBox,{text:r.id,width:180,height:180,colorDark:'#1a1a1a',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
-        const p=document.createElement('p');
-        p.style.cssText='font-size:.7rem;color:var(--muted);margin-top:.5rem;font-family:monospace;text-align:center;width:100%';
-        p.textContent='ID: '+r.id;
-        qrBox.parentElement.appendChild(p);
-      },80);
-    }
-  } catch(e) {
-    resEl.innerHTML=`<div style="padding:.65rem .875rem;background:#fef2f2;color:#991b1b;border:1px solid #fca5a5;border-radius:8px;font-size:.875rem">Error: ${e.message}</div>`;
-  }
-}
+  const subjects = courseId ? Object.keys(EXAMS[courseId] || {}) : [];
 
-// ─── ADMIN: REGISTROS ─────────────────────────────────
-async function cargarRegistros() {
-  const tbody=document.getElementById('tabla-registros');
-  const filtro=document.getElementById('filtro-estado').value;
-  tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--muted)">Cargando...</td></tr>';
-  try {
-    let path='registros?select=*&order=created_at.desc';
-    if(filtro) path+=`&estado=eq.${filtro}`;
-    const data=await sb(path);
-    actualizarStatsData(data);
-    if(!data||data.length===0){
-      tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--muted)">Sin registros.</td></tr>'; return;
-    }
-    tbody.innerHTML=data.map(r=>`
-      <tr>
-        <td style="font-weight:500">${r.nombre}</td>
-        <td style="font-size:.8rem;color:var(--muted)">${r.correo}</td>
-        <td style="font-size:.8rem">${r.ci_dni}</td>
-        <td style="font-size:.8rem">${r.ciudad}</td>
-        <td style="font-size:.75rem;color:var(--muted)">${r.comprobante_ref||'—'}${r.comprobante_img?` <a href="#" onclick="verImgModal(event,'${r.id}','${r.nombre}')">📎</a>`:''}</td>
-        <td>${badgeEstado(r.estado)}</td>
-        <td>
-          <div class="flex gap-2" style="flex-wrap:wrap">
-            ${r.estado==='pendiente'?`
-              <button class="btn btn-success btn-sm" onclick="aprobarRegistro('${r.id}','${r.nombre}')">✓ Aprobar</button>
-              <button class="btn btn-danger btn-sm" onclick="rechazarRegistro('${r.id}')">✗</button>
-            `:''}
-            ${r.estado==='aprobado'?`<button class="btn btn-outline btn-sm" onclick="verQRModal('${r.id}','${r.nombre}')">Ver QR</button>`:''}
-            ${r.estado==='presente'?`<span style="font-size:.75rem;color:#1e40af;font-weight:500">✓ Presente</span>`:''}
-            ${r.estado==='rechazado'?`<span style="font-size:.75rem;color:#991b1b">Rechazado</span>`:''}
+  const startQuiz = useCallback(() => {
+    if (!courseId || !subject) return;
+    const raw = EXAMS[courseId][subject];
+    setQuestions(prepareQuestions(raw));
+    setAnswers({});
+    setCurrent(0);
+    setSubmitted(false);
+    setScreen("quiz");
+  }, [courseId, subject]);
+
+  const selectAnswer = (qi, oi) => {
+    if (submitted) return;
+    setAnswers(prev => ({ ...prev, [qi]: oi }));
+  };
+
+  const finish = () => setSubmitted(true);
+
+  const score = useMemo(() => {
+    if (!submitted) return 0;
+    return questions.reduce((s, q, i) => s + (answers[i] === q.correctIndex ? 1 : 0), 0);
+  }, [submitted, questions, answers]);
+
+  const wrongOnes = useMemo(() => {
+    if (!submitted) return [];
+    return questions
+      .map((q, i) => ({ ...q, index: i, userAnswer: answers[i] }))
+      .filter(q => q.userAnswer !== q.correctIndex);
+  }, [submitted, questions, answers]);
+
+  const restart = () => {
+    setScreen("start");
+    setCourseId("");
+    setSubject("");
+    setQuestions([]);
+    setAnswers({});
+    setSubmitted(false);
+    setCurrent(0);
+  };
+
+  const retryQuiz = () => {
+    const raw = EXAMS[courseId][subject];
+    setQuestions(prepareQuestions(raw));
+    setAnswers({});
+    setCurrent(0);
+    setSubmitted(false);
+  };
+
+  /* ─── START SCREEN ─── */
+  if (screen === "start") {
+    return (
+      <div style={{ minHeight: "100vh", background: palette.bg, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif" }}>
+        <div style={{ background: palette.card, borderRadius: 20, padding: "40px 32px", maxWidth: 440, width: "100%", boxShadow: "0 8px 32px rgba(79,70,229,0.12)" }}>
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <div style={{ fontSize: 48, marginBottom: 8 }}>📝</div>
+            <h1 style={{ fontSize: 26, fontWeight: 700, color: palette.primary, margin: 0 }}>Olimpiadas Quiz</h1>
+            <p style={{ color: palette.muted, fontSize: 14, marginTop: 6 }}>Selecciona tu curso y materia para comenzar</p>
           </div>
-        </td>
-      </tr>`).join('');
-  } catch(e) {
-    tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--danger)">Error: ${e.message}</td></tr>`;
+
+          <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: palette.text, marginBottom: 6 }}>Curso</label>
+          <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+            {COURSES.map(c => (
+              <button
+                key={c.id}
+                onClick={() => { setCourseId(c.id); setSubject(""); }}
+                style={{
+                  flex: 1, padding: "12px 8px", borderRadius: 12, border: `2px solid ${courseId === c.id ? palette.primary : palette.border}`,
+                  background: courseId === c.id ? palette.primaryLight : "white", color: courseId === c.id ? palette.primaryDark : palette.text,
+                  fontWeight: 600, fontSize: 13, cursor: "pointer", transition: "all .15s"
+                }}
+              >{c.label}</button>
+            ))}
+          </div>
+
+          {subjects.length > 0 && (
+            <>
+              <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: palette.text, marginBottom: 6 }}>Materia</label>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
+                {subjects.map(s => (
+                  <button
+                    key={s}
+                    onClick={() => setSubject(s)}
+                    style={{
+                      padding: "12px 16px", borderRadius: 12, border: `2px solid ${subject === s ? palette.primary : palette.border}`,
+                      background: subject === s ? palette.primaryLight : "white", color: subject === s ? palette.primaryDark : palette.text,
+                      fontWeight: 600, fontSize: 14, cursor: "pointer", textAlign: "left", transition: "all .15s"
+                    }}
+                  >
+                    {s === "Ciencias Sociales" ? "🌍 " : "📖 "}{s}
+                    <span style={{ display: "block", fontSize: 11, fontWeight: 400, color: palette.muted, marginTop: 2 }}>
+                      {EXAMS[courseId][s].length} preguntas
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          <button
+            onClick={startQuiz}
+            disabled={!courseId || !subject}
+            style={{
+              width: "100%", padding: 14, borderRadius: 12, border: "none",
+              background: (!courseId || !subject) ? palette.border : palette.primary,
+              color: "white", fontWeight: 700, fontSize: 16, cursor: (!courseId || !subject) ? "default" : "pointer",
+              transition: "all .15s"
+            }}
+          >Comenzar examen</button>
+        </div>
+      </div>
+    );
   }
-}
-function badgeEstado(e){
-  const m={pendiente:['badge-pending','⏳ Pendiente'],aprobado:['badge-approved','✓ Aprobado'],rechazado:['badge-rejected','✗ Rechazado'],presente:['badge-present','✓ Presente']};
-  const [c,l]=m[e]||['badge-pending',e]; return `<span class="badge ${c}">${l}</span>`;
-}
-async function actualizarStats(){try{const d=await sb('registros?select=estado');actualizarStatsData(d);}catch(e){}}
-function actualizarStatsData(data){
-  if(!data) return;
-  document.getElementById('stat-total').textContent=data.length;
-  document.getElementById('stat-pend').textContent=data.filter(r=>r.estado==='pendiente').length;
-  document.getElementById('stat-aprov').textContent=data.filter(r=>r.estado==='aprobado').length;
-  document.getElementById('stat-present').textContent=data.filter(r=>r.estado==='presente').length;
-}
-async function aprobarRegistro(id,nombre) {
-  const btns=document.querySelectorAll('.btn-success.btn-sm');
-  btns.forEach(b=>{if(b.textContent.includes('Aprobar'))b.disabled=true;});
-  try {
-    await sb(`registros?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({estado:'aprobado',qr_code:id}),prefer:'return=minimal'});
-    showToast(`✓ ${nombre} aprobado correctamente`);
-    cargarRegistros();
-  } catch(e){alert('Error: '+e.message);}
-}
-async function rechazarRegistro(id){
-  if(!confirm('¿Rechazar este registro?')) return;
-  try{await sb(`registros?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({estado:'rechazado'}),prefer:'return=minimal'});cargarRegistros();}
-  catch(e){alert('Error: '+e.message);}
-}
-function verQRModal(id,nombre){
-  document.getElementById('modal-title').textContent=nombre;
-  document.getElementById('modal-sub').textContent='QR de acceso al evento';
-  document.getElementById('modal-body').innerHTML='<div style="display:flex;justify-content:center;margin:1rem 0" id="qrcode-display"></div><p style="font-size:.7rem;color:var(--muted);text-align:center;font-family:monospace;word-break:break-all">'+id+'</p>';
-  document.getElementById('modal-footer').innerHTML='<button class="btn btn-outline btn-full" onclick="closeModal()">Cerrar</button>';
-  document.getElementById('modal-overlay').classList.remove('hidden');
-  setTimeout(()=>{document.getElementById('qrcode-display').innerHTML='';new QRCode(document.getElementById('qrcode-display'),{text:id,width:190,height:190,colorDark:'#1a1a1a',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});},100);
-}
-function verImgModal(e,id,nombre){
-  e.preventDefault();
-  sb(`registros?id=eq.${id}&select=comprobante_img`).then(data=>{
-    if(!data||!data[0]||!data[0].comprobante_img){alert('Sin imagen');return;}
-    document.getElementById('modal-title').textContent=nombre;
-    document.getElementById('modal-sub').textContent='Comprobante de pago';
-    document.getElementById('modal-body').innerHTML=`<img src="${data[0].comprobante_img}" style="width:100%;border-radius:8px">`;
-    document.getElementById('modal-footer').innerHTML='<button class="btn btn-outline btn-full" onclick="closeModal()">Cerrar</button>';
-    document.getElementById('modal-overlay').classList.remove('hidden');
-  });
-}
-function closeModal(){document.getElementById('modal-overlay').classList.add('hidden');}
 
-// ─── TOAST ────────────────────────────────────────────
-function showToast(msg,warn=false){
-  let t=document.getElementById('_toast');
-  if(!t){t=document.createElement('div');t.id='_toast';t.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:.75rem 1.1rem;border-radius:10px;font-size:.875rem;font-weight:500;z-index:999;max-width:400px;text-align:center;transition:opacity .3s;box-shadow:0 4px 16px rgba(0,0,0,.12)';document.body.appendChild(t);}
-  t.textContent=msg;
-  t.style.background=warn?'#fef9ec':'#f0faf7';
-  t.style.color=warn?'#b45309':'#1D6B5A';
-  t.style.border=warn?'1px solid #fde68a':'1px solid #a7f3d0';
-  t.style.opacity='1';
-  clearTimeout(t._t);
-  t._t=setTimeout(()=>t.style.opacity='0',4000);
-}
+  /* ─── RESULTS SCREEN ─── */
+  if (screen === "quiz" && submitted) {
+    const pct = Math.round((score / questions.length) * 100);
+    const emoji = pct >= 80 ? "🏆" : pct >= 60 ? "👍" : pct >= 40 ? "💪" : "📚";
+    return (
+      <div style={{ minHeight: "100vh", background: palette.bg, padding: 16, fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif" }}>
+        <div style={{ maxWidth: 600, margin: "0 auto" }}>
+          {/* Score card */}
+          <div style={{ background: palette.card, borderRadius: 20, padding: "32px 24px", textAlign: "center", boxShadow: "0 8px 32px rgba(79,70,229,0.12)", marginBottom: 20 }}>
+            <div style={{ fontSize: 56 }}>{emoji}</div>
+            <h2 style={{ fontSize: 22, color: palette.text, margin: "8px 0 4px" }}>Resultados del examen</h2>
+            <p style={{ color: palette.muted, fontSize: 13, margin: "0 0 20px" }}>{subject}</p>
 
-// ─── SCANNER ──────────────────────────────────────────
-let scanStream=null,scanInt=null;
-async function startScanner(){
-  try{
-    scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-    const vid=document.getElementById('scanner-video');
-    vid.srcObject=scanStream; vid.style.display='block';
-    document.getElementById('scanner-idle').style.display='none';
-    document.getElementById('btn-stop').classList.remove('hidden');
-    const cv=document.createElement('canvas'),ctx=cv.getContext('2d');
-    scanInt=setInterval(()=>{
-      if(vid.readyState===vid.HAVE_ENOUGH_DATA){
-        cv.width=vid.videoWidth;cv.height=vid.videoHeight;
-        ctx.drawImage(vid,0,0);
-        const d=ctx.getImageData(0,0,cv.width,cv.height);
-        const code=jsQR(d.data,d.width,d.height);
-        if(code){stopScanner();marcarPresente(code.data);}
-      }
-    },200);
-  }catch(e){alert('No se pudo acceder a la cámara: '+e.message);}
-}
-function stopScanner(){
-  if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null;}
-  if(scanInt){clearInterval(scanInt);scanInt=null;}
-  document.getElementById('scanner-video').style.display='none';
-  document.getElementById('scanner-idle').style.display='block';
-  document.getElementById('btn-stop').classList.add('hidden');
-}
-async function marcarPresente(codigo){
-  if(!codigo) return;
-  const res=document.getElementById('scan-result');
-  res.style.display='block'; res.className='scan-result';
-  res.style.cssText='display:block;padding:.875rem 1rem;border-radius:8px;font-weight:500;font-size:.9rem;line-height:1.5;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;margin-top:.875rem';
-  res.innerHTML='⏳ Verificando...';
-  try{
-    const data=await sb(`registros?id=eq.${codigo.trim()}&select=*`);
-    if(!data||data.length===0){
-      res.style.cssText='display:block;padding:.875rem 1rem;border-radius:8px;font-weight:500;font-size:.9rem;line-height:1.5;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;margin-top:.875rem';
-      res.innerHTML='❌ QR no encontrado en el sistema.'; return;
-    }
-    const r=data[0];
-    if(r.estado==='presente'){
-      res.style.cssText='display:block;padding:.875rem 1rem;border-radius:8px;font-weight:500;font-size:.9rem;line-height:1.5;background:#fef9ec;border:1px solid #fde68a;color:#b45309;margin-top:.875rem';
-      res.innerHTML=`⚠️ <strong>${r.nombre}</strong> ya fue registrado como presente anteriormente.`; return;
-    }
-    if(r.estado==='pendiente'){
-      res.style.cssText='display:block;padding:.875rem 1rem;border-radius:8px;font-weight:500;font-size:.9rem;line-height:1.5;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;margin-top:.875rem';
-      res.innerHTML=`🔴 <strong>${r.nombre}</strong><br><span style="font-size:.85rem">PAGO NO VERIFICADO — No puede ingresar</span><br><span style="font-size:.8rem;opacity:.85">El admin debe aprobar el pago primero.</span>`; return;
-    }
-    if(r.estado==='rechazado'){
-      res.style.cssText='display:block;padding:.875rem 1rem;border-radius:8px;font-weight:500;font-size:.9rem;line-height:1.5;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;margin-top:.875rem';
-      res.innerHTML=`🚫 <strong>${r.nombre}</strong> — Registro rechazado. No puede ingresar.`; return;
-    }
-    // aprobado → marcar presente
-    await sb(`registros?id=eq.${codigo.trim()}`,{method:'PATCH',body:JSON.stringify({estado:'presente'}),prefer:'return=minimal'});
-    res.style.cssText='display:block;padding:.875rem 1rem;border-radius:8px;font-weight:500;font-size:.9rem;line-height:1.5;background:#f0faf7;border:1px solid #a7f3d0;color:#1D6B5A;margin-top:.875rem';
-    res.innerHTML=`✅ <strong>${r.nombre}</strong> (${r.ciudad})<br><span style="font-size:.85rem">¡Ingreso registrado correctamente!</span>`;
-    document.getElementById('manual-code').value='';
-    actualizarStats();
-  }catch(e){
-    res.style.cssText='display:block;padding:.875rem 1rem;border-radius:8px;font-weight:500;font-size:.9rem;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;margin-top:.875rem';
-    res.innerHTML='❌ Error: '+e.message;
+            <div style={{ display: "inline-flex", alignItems: "baseline", gap: 4, background: pct >= 60 ? palette.correctBg : palette.wrongBg, padding: "16px 32px", borderRadius: 16 }}>
+              <span style={{ fontSize: 48, fontWeight: 800, color: pct >= 60 ? palette.correct : palette.wrong }}>{score}</span>
+              <span style={{ fontSize: 20, color: palette.muted }}>/ {questions.length}</span>
+            </div>
+            <p style={{ fontSize: 14, color: palette.muted, marginTop: 8 }}>{pct}% de aciertos</p>
+
+            <div style={{ display: "flex", gap: 8, marginTop: 24 }}>
+              <button onClick={retryQuiz} style={{ flex: 1, padding: 12, borderRadius: 12, border: `2px solid ${palette.primary}`, background: "white", color: palette.primary, fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
+                Reintentar
+              </button>
+              <button onClick={restart} style={{ flex: 1, padding: 12, borderRadius: 12, border: "none", background: palette.primary, color: "white", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
+                Inicio
+              </button>
+            </div>
+          </div>
+
+          {/* Wrong answers */}
+          {wrongOnes.length > 0 && (
+            <div style={{ background: palette.card, borderRadius: 20, padding: "24px 20px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
+              <h3 style={{ fontSize: 16, color: palette.wrong, margin: "0 0 16px", display: "flex", alignItems: "center", gap: 8 }}>
+                <span>✗</span> Preguntas incorrectas ({wrongOnes.length})
+              </h3>
+              {wrongOnes.map((w, i) => (
+                <div key={i} style={{ padding: "14px 0", borderTop: i > 0 ? `1px solid ${palette.border}` : "none" }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: palette.text, margin: "0 0 8px" }}>{w.question}</p>
+                  {w.userAnswer !== undefined ? (
+                    <p style={{ fontSize: 12, color: palette.wrong, margin: "0 0 4px", display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ display: "inline-block", width: 16, height: 16, borderRadius: "50%", background: palette.wrongBg, textAlign: "center", lineHeight: "16px", fontSize: 10 }}>✗</span>
+                      Tu respuesta: {w.options[w.userAnswer]}
+                    </p>
+                  ) : (
+                    <p style={{ fontSize: 12, color: palette.muted, margin: "0 0 4px", fontStyle: "italic" }}>Sin respuesta</p>
+                  )}
+                  <p style={{ fontSize: 12, color: palette.correct, margin: 0, display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ display: "inline-block", width: 16, height: 16, borderRadius: "50%", background: palette.correctBg, textAlign: "center", lineHeight: "16px", fontSize: 10 }}>✓</span>
+                    Respuesta correcta: {w.options[w.correctIndex]}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
   }
-}
 
-// ─── INIT ─────────────────────────────────────────────
-window.addEventListener('load', loadConfig);
-</script>
-</body>
-</html>
+  /* ─── QUIZ SCREEN ─── */
+  const q = questions[current];
+  const totalQ = questions.length;
+  const answered = Object.keys(answers).length;
+  const progress = ((current + 1) / totalQ) * 100;
+
+  return (
+    <div style={{ minHeight: "100vh", background: palette.bg, padding: 16, fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif" }}>
+      <div style={{ maxWidth: 600, margin: "0 auto" }}>
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: palette.primary }}>{subject}</span>
+          <span style={{ fontSize: 12, color: palette.muted }}>{answered}/{totalQ} respondidas</span>
+        </div>
+
+        {/* Progress bar */}
+        <div style={{ height: 6, background: palette.primaryLight, borderRadius: 3, marginBottom: 20, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${progress}%`, background: palette.primary, borderRadius: 3, transition: "width .3s" }} />
+        </div>
+
+        {/* Question card */}
+        <div style={{ background: palette.card, borderRadius: 20, padding: "28px 24px", boxShadow: "0 4px 20px rgba(79,70,229,0.08)", marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+            <span style={{
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              width: 36, height: 36, borderRadius: "50%", background: palette.primaryLight,
+              color: palette.primary, fontWeight: 700, fontSize: 14, flexShrink: 0
+            }}>{current + 1}</span>
+            <span style={{ fontSize: 12, color: palette.muted }}>de {totalQ}</span>
+          </div>
+
+          <p style={{ fontSize: 16, fontWeight: 600, color: palette.text, margin: "0 0 20px", lineHeight: 1.5 }}>{q.question}</p>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {q.options.map((opt, oi) => {
+              const selected = answers[current] === oi;
+              return (
+                <button
+                  key={oi}
+                  onClick={() => selectAnswer(current, oi)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 12,
+                    padding: "14px 16px", borderRadius: 14,
+                    border: `2px solid ${selected ? palette.primary : palette.border}`,
+                    background: selected ? palette.primaryLight : "white",
+                    color: palette.text, fontSize: 14, textAlign: "left",
+                    cursor: "pointer", transition: "all .15s", lineHeight: 1.4
+                  }}
+                >
+                  <span style={{
+                    display: "inline-flex", alignItems: "center", justifyContent: "center",
+                    width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
+                    border: `2px solid ${selected ? palette.primary : palette.border}`,
+                    background: selected ? palette.primary : "white",
+                    color: selected ? "white" : palette.muted,
+                    fontSize: 12, fontWeight: 700
+                  }}>
+                    {String.fromCharCode(65 + oi)}
+                  </span>
+                  {opt}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div style={{ display: "flex", gap: 8 }}>
+          <button
+            onClick={() => setCurrent(c => Math.max(0, c - 1))}
+            disabled={current === 0}
+            style={{
+              flex: 1, padding: 13, borderRadius: 12, border: `2px solid ${palette.border}`,
+              background: "white", color: current === 0 ? palette.border : palette.text,
+              fontWeight: 600, fontSize: 14, cursor: current === 0 ? "default" : "pointer"
+            }}
+          >← Anterior</button>
+
+          {current < totalQ - 1 ? (
+            <button
+              onClick={() => setCurrent(c => Math.min(totalQ - 1, c + 1))}
+              style={{
+                flex: 1, padding: 13, borderRadius: 12, border: "none",
+                background: palette.primary, color: "white",
+                fontWeight: 600, fontSize: 14, cursor: "pointer"
+              }}
+            >Siguiente →</button>
+          ) : (
+            <button
+              onClick={finish}
+              style={{
+                flex: 1, padding: 13, borderRadius: 12, border: "none",
+                background: palette.accent, color: "white",
+                fontWeight: 600, fontSize: 14, cursor: "pointer"
+              }}
+            >Finalizar ✓</button>
+          )}
+        </div>
+
+        {/* Question dots */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginTop: 16, padding: "0 8px" }}>
+          {questions.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              style={{
+                width: 28, height: 28, borderRadius: "50%", border: "none",
+                fontSize: 10, fontWeight: 600, cursor: "pointer",
+                background: i === current ? palette.primary : (answers[i] !== undefined ? palette.primaryLight : "#E2E8F0"),
+                color: i === current ? "white" : (answers[i] !== undefined ? palette.primary : palette.muted),
+              }}
+            >{i + 1}</button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
