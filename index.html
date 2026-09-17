@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Olimpiadas Quiz</title>
+<title>Examen Lenguaje - 2° Primaria</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#F0F4FF;min-height:100vh;color:#1E293B}
@@ -11,29 +12,39 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#F0F4F
 .card{background:#fff;border-radius:20px;padding:32px 24px;box-shadow:0 8px 32px rgba(79,70,229,.12)}
 .card-sm{background:#fff;border-radius:20px;padding:24px 20px;box-shadow:0 4px 16px rgba(0,0,0,.06)}
 .center{text-align:center}
-.emoji{font-size:48px;margin-bottom:8px}
-h1{font-size:26px;font-weight:700;color:#4F46E5;margin:0}
+.emoji-lg{font-size:48px;margin-bottom:8px}
+h1{font-size:24px;font-weight:700;color:#4F46E5;margin:0}
 h2{font-size:22px;margin:8px 0 4px}
-h3{font-size:16px;margin:0 0 16px;display:flex;align-items:center;gap:8px}
 .sub{color:#64748B;font-size:14px;margin-top:6px}
 .sub-sm{color:#64748B;font-size:13px}
 .label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
-.btn-row{display:flex;gap:8px;margin-bottom:20px}
-.btn-row.col{flex-direction:column}
-.btn{padding:12px 16px;border-radius:12px;border:2px solid #CBD5E1;background:#fff;font-weight:600;font-size:13px;cursor:pointer;transition:all .15s;text-align:left;width:100%}
-.btn:hover{border-color:#a5b4fc}
-.btn.active{border-color:#4F46E5;background:#E0E7FF;color:#3730A3}
-.btn-primary{width:100%;padding:14px;border-radius:12px;border:none;background:#4F46E5;color:#fff;font-weight:700;font-size:16px;cursor:pointer}
+.input{width:100%;padding:14px 16px;border-radius:12px;border:2px solid #CBD5E1;font-size:15px;outline:none;transition:border .15s;font-family:inherit}
+.input:focus{border-color:#4F46E5}
+.input.error{border-color:#DC2626}
+.error-msg{color:#DC2626;font-size:12px;margin-top:6px;display:none}
+.error-msg.show{display:block}
+.btn-primary{width:100%;padding:14px;border-radius:12px;border:none;background:#4F46E5;color:#fff;font-weight:700;font-size:16px;cursor:pointer;margin-top:16px}
 .btn-primary:disabled{background:#CBD5E1;cursor:default}
 .btn-primary:not(:disabled):hover{background:#3730A3}
 .btn-outline{flex:1;padding:13px;border-radius:12px;border:2px solid #CBD5E1;background:#fff;font-weight:600;font-size:14px;cursor:pointer}
-.btn-outline:hover{border-color:#a5b4fc}
 .btn-outline:disabled{color:#CBD5E1;cursor:default}
 .btn-nav{flex:1;padding:13px;border-radius:12px;border:none;background:#4F46E5;color:#fff;font-weight:600;font-size:14px;cursor:pointer}
 .btn-nav:hover{background:#3730A3}
 .btn-finish{flex:1;padding:13px;border-radius:12px;border:none;background:#F59E0B;color:#fff;font-weight:600;font-size:14px;cursor:pointer}
 .btn-finish:hover{background:#D97706}
-.subject-count{display:block;font-size:11px;font-weight:400;color:#64748B;margin-top:2px}
+
+/* Timer */
+.timer-bar{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #E2E8F0;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;margin:-16px -16px 16px -16px;width:calc(100% + 32px)}
+.timer-left{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700}
+.timer-icon{font-size:18px}
+.timer-time{font-variant-numeric:tabular-nums;min-width:52px}
+.timer-time.warn{color:#DC2626;animation:pulse 1s infinite}
+.timer-name{font-size:12px;color:#64748B;font-weight:500;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.timer-progress{height:4px;background:#E0E7FF;border-radius:2px;margin:-2px -16px 16px -16px;width:calc(100% + 32px);overflow:hidden}
+.timer-progress-bar{height:100%;background:#4F46E5;border-radius:2px;transition:width 1s linear}
+.timer-progress-bar.warn{background:#DC2626}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
 .progress-wrap{height:6px;background:#E0E7FF;border-radius:3px;margin-bottom:20px;overflow:hidden}
 .progress-bar{height:100%;background:#4F46E5;border-radius:3px;transition:width .3s}
 .header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
@@ -64,15 +75,18 @@ h3{font-size:16px;margin:0 0 16px;display:flex;align-items:center;gap:8px}
 .wrong-yours{font-size:12px;color:#DC2626;margin-bottom:4px;display:flex;align-items:center;gap:6px}
 .wrong-correct{font-size:12px;color:#16A34A;display:flex;align-items:center;gap:6px}
 .wrong-none{font-size:12px;color:#64748B;font-style:italic;margin-bottom:4px}
-.icon-circle{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;font-size:10px;line-height:16px;text-align:center;flex-shrink:0}
+.icon-circle{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;font-size:10px;flex-shrink:0}
 .icon-wrong{background:#FEE2E2}
 .icon-right{background:#DCFCE7}
 .results-actions{display:flex;gap:8px;margin-top:24px}
 .full-center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.mb8{margin-bottom:8px}
+.mb16{margin-bottom:16px}
 .mb20{margin-bottom:20px}
 .mb24{margin-bottom:24px}
-.mb16{margin-bottom:16px}
 .mt8{margin-top:8px}
+.timeout-badge{display:inline-block;background:#FEF3C7;color:#92400E;font-size:12px;font-weight:600;padding:4px 12px;border-radius:8px;margin-top:8px}
+.student-name{font-size:14px;color:#4F46E5;font-weight:600}
 </style>
 </head>
 <body>
@@ -80,185 +94,147 @@ h3{font-size:16px;margin:0 0 16px;display:flex;align-items:center;gap:8px}
 <div id="app"></div>
 
 <script>
-/* ══════════ DATA ══════════ */
-const EXAMS = {
-  "2-primaria": {
-    "Lenguaje": [
-      ["¿En cuál de las siguientes opciones TODAS las letras son vocales?", ["a, e, p, u", "e, i, o, u", "a, o, m, e"], 1],
-      ["Si dividimos correctamente en sílabas la palabra \"mariposa\" (ma-ri-po-sa), ¿cuántas sílabas tiene?", ["3 sílabas", "4 sílabas", "5 sílabas"], 1],
-      ["Identifica la vocal con la que inicia la palabra \"Avión\" y la letra final de la palabra \"Helado\":", ["Inicia con A, termina con O", "Inicia con E, termina con A", "Inicia con I, termina con O"], 0],
-      ["¿Cuál de las siguientes sílabas falta para completar la palabra del animal saltarín: \"Ra - ____ - na\"?", ["ta", "to", "te"], 0],
-      ["¿Qué sonido exacto se forma al unir la consonante \"m\" con las vocales \"o\" y \"a\" en ese orden?", ["mo - ma", "me - mo", "ma - mo"], 0],
-      ["¿Cuántas letras en total tiene la palabra \"sol\" y cuántas vocales contiene?", ["3 letras y 2 vocales", "3 letras y 1 vocal", "4 letras y 1 vocal"], 1],
-      ["Selecciona la opción que contiene únicamente palabras de 3 sílabas (trisílabas):", ["sol, perro, pan", "caracol, estrella, camisa", "mariposa, helicóptero, luz"], 1],
-      ["Marca la palabra que comience con la consonante \"s\" y termine con la vocal \"a\":", ["Sombrero", "Sopa", "Sol"], 1],
-      ["¿Cuál es el artículo determinado que corresponde a la palabra \"manzana\"?", ["El manzana", "La manzana", "Los manzana"], 1],
-      ["De acuerdo con la regla de uso de mayúsculas en nombres propios, ¿cómo debe escribirse el nombre de una persona?", ["juan (todo minúscula)", "JUAN (todo mayúscula)", "Juan (primera letra mayúscula)"], 2],
-      ["¿Cuál es la regla correcta para formar el plural de las palabras que terminan en \"z\", como \"lápiz\"?", ["Se cambia la Z por C y se agrega \"es\" (lápices)", "Se mantiene la Z y se agrega \"s\" (lápizs)", "Se escribe con Z y \"es\" (lápizes)"], 0],
-      ["La letra \"H\" es muda en español. Identifica la palabra redactada correctamente con \"H\":", ["elado", "helado", "eladoh"], 1],
-      ["Observa la frase: \"¿Cuál es tu animal favorito?\". ¿Qué signos se usan para realizar preguntas?", ["Signos de admiración ( ¡ ! )", "Signos de interrogación ( ¿ ? )", "Punto y coma ( ; )"], 1],
-      ["Distingue la palabra que está escrita con la ortografía correcta:", ["Vaca (con V)", "Baka (con B y K)", "Vaka (con V y K)"], 0],
-      ["¿Qué signo ortográfico es obligatorio colocar al finalizar toda oración?", ["Una coma ( , )", "Un punto ( . )", "Un guión ( - )"], 1],
-      ["¿Por qué se dice que la letra \"H\" es una letra especial en el idioma español?", ["Porque suena como la letra S", "Porque es una letra muda (no tiene sonido propio)", "Porque siempre se escribe al final de las palabras"], 1],
-      ["Dos palabras riman cuando terminan con el mismo sonido. ¿Cuál rima con \"gato\"?", ["Pato", "Perro", "Ratón"], 0],
-      ["Lee la oración: \"El perro corre en el parque\". ¿Quién es el sujeto que realiza la acción de correr?", ["corre", "el parque", "El perro"], 2],
-      ["Los antónimos son palabras con significados opuestos. ¿Cuál es el antónimo de la palabra \"día\"?", ["Sol", "Noche", "Luz"], 1],
-      ["¿Cuál es la forma en femenino de la palabra \"león\"?", ["Leona", "Leoncita", "Leonera"], 0],
-      ["Una sílaba trabada se compone de dos consonantes seguidas de una vocal. Encuentra la palabra con sílaba trabada:", ["Flor (fl)", "Mesa (m)", "Cama (c)"], 0],
-      ["Los sinónimos son palabras que significan lo mismo. ¿Cuál es el sinónimo de la palabra \"pequeño\"?", ["Grande", "Chico", "Alto"], 1],
-      ["Si completas \"_ato\" con la consonante \"g\", obtienes \"gato\". ¿Qué animal se forma si la completas con \"p\"?", ["Rato", "Pato", "Mato"], 1],
-      ["Clasificación semántica: ¿Cuál de las siguientes palabras corresponde a la categoría de un COLOR?", ["Dulce", "Rojo", "Salado"], 1],
-      ["Encuentra la pareja de palabras que tienen rima consonante perfecta al terminar en \"-ón\":", ["Camión y Avión", "Camión y Casa", "Camión y Flor"], 0]
-    ]
-  },
-  "4-primaria": {
-    "Ciencias Sociales": [
-      ["La conquista española provocó grandes cambios en la vida de los pueblos originarios.", ["Verdadero", "Falso"], 0],
-      ["Durante la época colonial, todos los grupos sociales tenían los mismos derechos.", ["Verdadero", "Falso"], 1],
-      ["Los pueblos indígenas realizaron diferentes rebeliones contra el dominio colonial.", ["Verdadero", "Falso"], 0],
-      ["La independencia del Alto Perú se logró de un día para otro y sin luchas.", ["Verdadero", "Falso"], 1],
-      ["La Guerra del Acre estuvo relacionada con la disputa por un territorio rico en recursos naturales, especialmente la goma.", ["Verdadero", "Falso"], 0],
-      ["¿Qué ocurrió el 6 de agosto de 1825?", ["Se fundó la ciudad de La Paz", "Se declaró la independencia y nació Bolivia como país libre y soberano", "Se firmó un tratado de paz con España", "Se eligió al primer presidente"], 1],
-      ["¿Cuál fue una de las funciones de la Primera Asamblea Constituyente?", ["Organizar el nuevo país", "Iniciar la conquista española", "Declarar la Guerra del Pacífico", "Entregar el territorio del Acre"], 0],
-      ["¿Cómo se llamó inicialmente nuestro país después de su independencia?", ["Estado del Alto Perú", "República de Bolívar", "República del Acre", "Nueva España"], 1],
-      ["¿Qué documento declaró oficialmente la independencia del nuevo país?", ["La Constitución Política", "El Acta de la Independencia", "El Tratado de Paz", "El Diario de Guerra"], 1],
-      ["¿Quién fue el primer presidente de Bolivia?", ["Antonio José de Sucre", "Simón Bolívar", "Andrés de Santa Cruz", "Túpac Katari"], 0],
-      ["¿Qué país ocupó el Litoral boliviano durante la Guerra del Pacífico?", ["Argentina", "Brasil", "Chile", "Perú"], 2],
-      ["Bolivia nació como país independiente en el año 1825.", ["Verdadero", "Falso"], 0],
-      ["Al inicio de la República, Bolivia tenía un territorio más extenso que el actual.", ["Verdadero", "Falso"], 0],
-      ["La organización política de la República permitió establecer autoridades e instituciones para gobernar el país.", ["Verdadero", "Falso"], 0],
-      ["En la época republicana, todas las personas tenían inmediatamente los mismos derechos y oportunidades.", ["Verdadero", "Falso"], 1],
-      ["La Guerra del Pacífico ocasionó que Bolivia perdiera su salida soberana al océano Pacífico.", ["Verdadero", "Falso"], 0],
-      ["¿Qué son los gobiernos autónomos departamentales?", ["Una institución que gobierna todo el país", "Una institución que ejerce autoridad en un departamento", "Una organización que administra empresas privadas", "Un grupo elegido para el congreso nacional"], 1],
-      ["¿De qué se encargan los gobiernos autónomos departamentales?", ["De las relaciones internacionales", "De la administración de cada departamento y municipio", "De la defensa militar del territorio", "De la educación universitaria"], 1],
-      ["¿Por qué los gobiernos departamentales son autónomos?", ["Porque no dependen de ninguna ley", "Porque cada departamento administra sus recursos económicos", "Porque eligen a su propio presidente", "Porque no pertenecen a Bolivia"], 1],
-      ["¿Quién es el Gobernador actual de Cochabamba?", ["Evo Morales", "Leonardo Loza", "Luis Arce", "Manfred Reyes Villa"], 1],
-      ["¿Qué son los recursos naturales?", ["Los productos fabricados en industrias", "Las riquezas que nos brinda la naturaleza", "Los bienes importados de otros países", "Las herramientas de trabajo agrícola"], 1],
-      ["¿Cómo se clasifican los recursos naturales?", ["Grandes, medianos y pequeños", "Permanentes, renovables y no renovables", "Animales, vegetales y minerales", "Primarios y secundarios"], 1],
-      ["¿Cuáles son recursos permanentes?", ["Las plantas y los animales", "Los minerales y los hidrocarburos", "El suelo, el agua, el aire y la energía solar", "La madera y el papel"], 2],
-      ["¿Cuáles son ejemplos de recursos naturales renovables?", ["Los minerales y los hidrocarburos", "Las plantas y los animales", "El petróleo y el gas", "El oro y la plata"], 1],
-      ["¿Cuáles son ejemplos de recursos naturales no renovables?", ["Las plantas y los animales", "El suelo y el agua", "Los minerales y los hidrocarburos", "La energía solar y el aire"], 2],
-      ["¿Qué es el desarrollo sostenible?", ["Construir más fábricas rápidamente", "Cuidar los recursos naturales para la población actual y futura", "Explotar todos los recursos lo más rápido posible", "Importar recursos de otros países"], 1],
-      ["¿Cómo se clasifican las actividades económicas?", ["Fáciles y difíciles", "Primarias, secundarias y terciarias", "Grandes y pequeñas", "Urbanas y rurales"], 1],
-      ["¿Cuál de estas es una actividad económica primaria?", ["La fabricación de automóviles", "El turismo", "La agricultura", "El comercio en tiendas"], 2],
-      ["¿En qué consiste la agricultura?", ["En la crianza de animales", "En el laboreo de los campos de cultivo", "En la extracción de minerales", "En la venta de productos"], 1],
-      ["¿Qué mineral se produce en mayor cantidad en Bolivia?", ["El oro", "La plata", "El zinc", "El estaño"], 2],
-      ["¿Qué fecha se recuerda como Día del Estado Plurinacional de Bolivia?", ["6 de agosto", "22 de enero", "1 de mayo", "25 de diciembre"], 1],
-      ["¿Qué fecha se recuerda como Día del Mar?", ["12 de abril", "23 de marzo", "19 de marzo", "1 de mayo"], 1],
-      ["¿Qué fecha se recuerda como Día del Niño en Bolivia?", ["25 de diciembre", "1 de junio", "12 de abril", "21 de septiembre"], 2],
-      ["¿Qué fecha se recuerda como Día del Trabajo?", ["6 de agosto", "23 de marzo", "1 de mayo", "22 de enero"], 2],
-      ["¿Qué fecha se recuerda como Día de la Madre en Bolivia?", ["8 de marzo", "27 de mayo", "12 de abril", "1 de mayo"], 1],
-      ["¿Qué fecha se recuerda como Día del Maestro?", ["6 de junio", "6 de agosto", "21 de septiembre", "27 de mayo"], 0],
-      ["¿Qué fecha se recuerda como Día de la Patria?", ["22 de enero", "23 de marzo", "6 de agosto", "17 de agosto"], 2],
-      ["¿Qué fecha se recuerda como Día de la Bandera boliviana?", ["6 de agosto", "17 de agosto", "21 de septiembre", "22 de enero"], 1],
-      ["¿Qué fecha se recuerda como Día del Estudiante?", ["12 de abril", "6 de junio", "21 de septiembre", "27 de mayo"], 2],
-      ["¿Qué fecha se recuerda como Día del Padre?", ["19 de marzo", "27 de mayo", "6 de junio", "1 de mayo"], 0],
-      ["¿Cuáles son danzas folklóricas de Cochabamba?", ["Morenada, Diablada y Tinku", "Caporales, Cueca cochabambina y Salaque", "Saya, Tobas y Kullawada", "Waca Waca, Llamerada y Pujllay"], 1],
-      ["¿Bolivia solo tiene una danza folklórica?", ["Sí, solo tiene una danza nacional", "No, Bolivia tiene muchas danzas según cada región", "Sí, la Cueca es la única", "No tiene danzas propias"], 1],
-      ["¿Cuáles son costumbres y tradiciones de Bolivia?", ["Halloween, Navidad y Año Nuevo", "Todos Santos, la Ch'alla y el Carnaval de Oruro", "Día de Acción de Gracias y San Valentín", "Oktoberfest y Pascua"], 1],
-      ["¿Cuántas banderas ha tenido Bolivia a lo largo de su historia?", ["1 bandera", "2 banderas", "3 banderas", "4 banderas"], 2],
-      ["¿Cuántas estrellas tenía el primer Escudo de Bolivia?", ["9 estrellas", "5 estrellas", "3 estrellas", "7 estrellas"], 1],
-      ["¿Cuáles son las flores nacionales de Bolivia?", ["La rosa y el clavel", "La kantuta y el patujú", "La orquídea y el girasol", "El jazmín y la violeta"], 1],
-      ["¿En qué año fue promulgada la actual Constitución Política del Estado boliviano?", ["2005", "2009", "2015", "2000"], 1],
-      ["¿Cuántos artículos contiene la actual Constitución Política del Estado boliviano?", ["200 artículos", "300 artículos", "411 artículos", "500 artículos"], 2]
-    ],
-    "Lenguaje": [
-      ["¿Qué es la comunicación?", ["Una forma de jugar", "El proceso de transmitir y recibir información", "Una forma de escribir solamente", "Un tipo de dibujo"], 1],
-      ["¿Cuál es un elemento importante de la comunicación?", ["Emisor", "Cuaderno", "Regla", "Recreo"], 0],
-      ["¿Qué es el lenguaje?", ["Un medio que utilizamos para comunicarnos y expresar ideas", "Un juego de palabras", "Una materia de matemática", "Un instrumento musical"], 0],
-      ["La comunicación verbal se realiza principalmente mediante:", ["Dibujos", "Palabras orales o escritas", "Señales de tránsito solamente", "Gestos únicamente"], 1],
-      ["¿Qué permitió la comunicación escrita?", ["Guardar y transmitir información a través del tiempo", "Solamente dibujar", "Hablar más fuerte", "Jugar con letras"], 0],
-      ["Una de las primeras formas de escritura fue:", ["La escritura mediante dibujos y símbolos", "Los mensajes de celular", "El periódico", "El libro digital"], 0],
-      ["¿Qué es un diario personal o íntimo?", ["Un periódico que leen todas las personas", "Un escrito donde una persona expresa sus experiencias y sentimientos", "Un libro de matemáticas", "Una carta comercial"], 1],
-      ["¿Cuál de las siguientes palabras lleva tilde correctamente?", ["arbol", "lapiz", "fácilmente", "dificil"], 2],
-      ["¿Qué invento permitió producir muchos libros y textos con mayor rapidez?", ["La imprenta", "El teléfono", "La televisión", "La radio"], 0],
-      ["¿Cuál es la función principal de un periódico o diario?", ["Informar sobre acontecimientos y hechos", "Enseñar solamente matemáticas", "Contar únicamente cuentos", "Vender juguetes"], 0],
-      ["¿Qué es la poesía?", ["Una forma de expresión artística mediante palabras", "Una noticia del periódico", "Una carta personal", "Una regla ortográfica"], 0],
-      ["El lenguaje literario se caracteriza por:", ["Ser creativo y expresivo", "Usar solamente números", "No expresar sentimientos", "Dar únicamente órdenes"], 0],
-      ["¿Qué significa declamar?", ["Leer rápidamente sin comprender", "Expresar un poema con emoción, entonación y gestos", "Copiar un texto", "Escribir una noticia"], 1],
-      ["La comunicación permite transmitir ideas, sentimientos e información.", ["Verdadero", "Falso"], 0],
-      ["La comunicación verbal utiliza únicamente gestos y movimientos.", ["Verdadero", "Falso"], 1],
-      ["La escritura ayudó a conservar conocimientos y acontecimientos importantes.", ["Verdadero", "Falso"], 0],
-      ["La imprenta permitió la difusión de libros, periódicos y otros textos.", ["Verdadero", "Falso"], 0],
-      ["Un diario personal puede contener experiencias y sentimientos de una persona.", ["Verdadero", "Falso"], 0],
-      ["¿Cómo se llama la persona que envía un mensaje en la comunicación?", ["Receptor", "Emisor", "Canal", "Código"], 1],
-      ["¿Cómo se llama la persona que recibe el mensaje?", ["Emisor", "Receptor", "Mensaje", "Contexto"], 1],
-      ["¿Cuáles son los componentes básicos de la comunicación?", ["Solo emisor y receptor", "Emisor, receptor, mensaje, código, canal y contexto", "Solo mensaje y canal", "Emisor y código"], 1],
-      ["¿Qué es la abreviatura?", ["Una palabra larga", "El acortamiento en la escritura de una palabra", "Un sinónimo", "Un tipo de oración"], 1],
-      ["¿Qué es la sigla?", ["Una palabra compuesta", "Cada una de las letras iniciales de un grupo de palabras", "Un tipo de verbo", "Una oración completa"], 1],
-      ["¿Qué es la narración?", ["Una ecuación matemática", "El relato de hechos vividos o imaginados por una o varias personas", "Un tipo de dibujo", "Una regla ortográfica"], 1],
-      ["¿Cuáles son los cinco elementos de la narración?", ["Título, autor, fecha, lugar y hora", "Narrador, acciones, personajes, espacio y tiempo", "Inicio, medio, fin, autor y lector", "Sujeto, verbo, predicado, adjetivo y adverbio"], 1],
-      ["¿Cuál es la estructura del cuento?", ["Inicio y final", "Introducción, nudo y desenlace", "Título, cuerpo y firma", "Saludo, desarrollo y despedida"], 1],
-      ["¿Qué es el punto?", ["Un signo que separa palabras", "Un signo de puntuación que sirve para terminar una frase de sentido completo", "Un signo que indica pregunta", "Un adorno en la escritura"], 1],
-      ["¿Qué son las narraciones ancestrales?", ["Noticias recientes de la televisión", "Narraciones antiguas difundidas a través del tiempo", "Historias inventadas ayer", "Informes científicos modernos"], 1],
-      ["¿Qué es la leyenda?", ["Un poema moderno", "Narraciones transmitidas de generación en generación", "Una noticia del periódico", "Un informe escolar"], 1],
-      ["En la oración: \"Manuel está feliz\". ¿Qué pronombre sustituye a Manuel?", ["Yo", "Ella", "Él", "Nosotros"], 2],
-      ["¿Qué artículo va delante de \"auto\"?", ["La", "El", "Los", "Las"], 1],
-      ["¿Cuáles son los dos tipos de artículos?", ["Grandes y pequeños", "Artículos definidos y artículos indefinidos", "Artículos largos y cortos", "Artículos simples y compuestos"], 1],
-      ["¿Para qué sirve la coma?", ["Para terminar un texto", "Para hacer pequeñas pausas al leer un texto", "Para indicar una pregunta", "Para separar párrafos"], 1],
-      ["¿Cuáles son las partes de una exposición?", ["Solo introducción y conclusión", "Introducción, desarrollo, conclusión y plenario", "Título y cuerpo", "Saludo y despedida"], 1],
-      ["¿Cuál es el verbo en la siguiente oración: \"Los niños corren en el recreo\"?", ["niños", "recreo", "corren", "Los"], 2],
-      ["¿Qué es un comunicado?", ["Un poema artístico", "Un informe que comunica información para conocimiento público", "Una carta personal", "Un cuento de hadas"], 1],
-      ["¿Cuál es la diferencia entre publicidad y propaganda?", ["Son exactamente lo mismo", "La publicidad busca vender un producto, la propaganda busca influir en la actitud de la comunidad", "La publicidad es oral y la propaganda es escrita", "No existe diferencia alguna"], 1],
-      ["¿Qué es un debate?", ["Una pelea entre personas", "Una discusión planificada y argumentativa", "Un monólogo individual", "Un tipo de cuento"], 1],
-      ["¿Quiénes participan en un debate?", ["Solo el público", "El moderador y los participantes", "Solo una persona", "El escritor y el lector"], 1],
-      ["¿Qué es el método Cornell?", ["Un tipo de examen", "Una técnica para tomar apuntes", "Un deporte", "Una forma de dibujar"], 1],
-      ["¿Para qué sirve el mapa conceptual?", ["Para dibujar paisajes", "Para comprender un tema usando información visual y organizada", "Para escribir cartas", "Para hacer cálculos matemáticos"], 1],
-      ["¿Cuáles son las partes reconocidas de una carta?", ["Solo saludo y despedida", "Fecha, destinatario, cargo, lugar, referencia, saludo, desarrollo, despedida y firma", "Solo el mensaje", "Título y autor"], 1],
-      ["¿Cuándo se escribe con mayúscula?", ["Solo al inicio de un texto", "La primera letra de un escrito, después de punto, nombres propios y al iniciar citas textuales", "Nunca se usa mayúscula", "Solo en nombres de ciudades"], 1],
-      ["¿Cuáles son las partes de una receta de cocina?", ["Solo los ingredientes", "Nombre del plato, tiempo de preparación, ingredientes e instrucciones", "Solo el nombre del plato", "Título y firma del chef"], 1]
-    ]
-  }
-};
-
-const COURSES = [
-  { id: "2-primaria", label: "2° de Primaria" },
-  { id: "4-primaria", label: "4° de Primaria" }
+/* ══════════ QUESTIONS ══════════ */
+const QUESTIONS_RAW = [
+  ["¿En cuál de las siguientes opciones TODAS las letras son vocales?", ["a, e, p, u", "e, i, o, u", "a, o, m, e"], 1],
+  ["Si dividimos correctamente en sílabas la palabra \"mariposa\" (ma-ri-po-sa), ¿cuántas sílabas tiene?", ["3 sílabas", "4 sílabas", "5 sílabas"], 1],
+  ["Identifica la vocal con la que inicia la palabra \"Avión\" y la letra final de la palabra \"Helado\":", ["Inicia con A, termina con O", "Inicia con E, termina con A", "Inicia con I, termina con O"], 0],
+  ["¿Cuál de las siguientes sílabas falta para completar la palabra del animal saltarín: \"Ra - ____ - na\"?", ["ta", "to", "te"], 0],
+  ["¿Qué sonido exacto se forma al unir la consonante \"m\" con las vocales \"o\" y \"a\" en ese orden?", ["mo - ma", "me - mo", "ma - mo"], 0],
+  ["¿Cuántas letras en total tiene la palabra \"sol\" y cuántas vocales contiene?", ["3 letras y 2 vocales", "3 letras y 1 vocal", "4 letras y 1 vocal"], 1],
+  ["Selecciona la opción que contiene únicamente palabras de 3 sílabas (trisílabas):", ["sol, perro, pan", "caracol, estrella, camisa", "mariposa, helicóptero, luz"], 1],
+  ["Marca la palabra que comience con la consonante \"s\" y termine con la vocal \"a\":", ["Sombrero", "Sopa", "Sol"], 1],
+  ["¿Cuál es el artículo determinado que corresponde a la palabra \"manzana\"?", ["El manzana", "La manzana", "Los manzana"], 1],
+  ["De acuerdo con la regla de uso de mayúsculas en nombres propios, ¿cómo debe escribirse el nombre de una persona?", ["juan (todo minúscula)", "JUAN (todo mayúscula)", "Juan (primera letra mayúscula)"], 2],
+  ["¿Cuál es la regla correcta para formar el plural de las palabras que terminan en \"z\", como \"lápiz\"?", ["Se cambia la Z por C y se agrega \"es\" (lápices)", "Se mantiene la Z y se agrega \"s\" (lápizs)", "Se escribe con Z y \"es\" (lápizes)"], 0],
+  ["La letra \"H\" es muda en español. Identifica la palabra redactada correctamente con \"H\":", ["elado", "helado", "eladoh"], 1],
+  ["Observa la frase: \"¿Cuál es tu animal favorito?\". ¿Qué signos se usan para realizar preguntas?", ["Signos de admiración ( ¡ ! )", "Signos de interrogación ( ¿ ? )", "Punto y coma ( ; )"], 1],
+  ["Distingue la palabra que está escrita con la ortografía correcta:", ["Vaca (con V)", "Baka (con B y K)", "Vaka (con V y K)"], 0],
+  ["¿Qué signo ortográfico es obligatorio colocar al finalizar toda oración?", ["Una coma ( , )", "Un punto ( . )", "Un guión ( - )"], 1],
+  ["¿Por qué se dice que la letra \"H\" es una letra especial en el idioma español?", ["Porque suena como la letra S", "Porque es una letra muda (no tiene sonido propio)", "Porque siempre se escribe al final de las palabras"], 1],
+  ["Dos palabras riman cuando terminan con el mismo sonido. ¿Cuál rima con \"gato\"?", ["Pato", "Perro", "Ratón"], 0],
+  ["Lee la oración: \"El perro corre en el parque\". ¿Quién es el sujeto que realiza la acción de correr?", ["corre", "el parque", "El perro"], 2],
+  ["Los antónimos son palabras con significados opuestos. ¿Cuál es el antónimo de la palabra \"día\"?", ["Sol", "Noche", "Luz"], 1],
+  ["¿Cuál es la forma en femenino de la palabra \"león\"?", ["Leona", "Leoncita", "Leonera"], 0],
+  ["Una sílaba trabada se compone de dos consonantes seguidas de una vocal. Encuentra la palabra con sílaba trabada:", ["Flor (fl)", "Mesa (m)", "Cama (c)"], 0],
+  ["Los sinónimos son palabras que significan lo mismo. ¿Cuál es el sinónimo de la palabra \"pequeño\"?", ["Grande", "Chico", "Alto"], 1],
+  ["Si completas \"_ato\" con la consonante \"g\", obtienes \"gato\". ¿Qué animal se forma si la completas con \"p\"?", ["Rato", "Pato", "Mato"], 1],
+  ["Clasificación semántica: ¿Cuál de las siguientes palabras corresponde a la categoría de un COLOR?", ["Dulce", "Rojo", "Salado"], 1],
+  ["Encuentra la pareja de palabras que tienen rima consonante perfecta al terminar en \"-ón\":", ["Camión y Avión", "Camión y Casa", "Camión y Flor"], 0]
 ];
 
+const TOTAL_TIME = 10 * 60; // 10 minutes in seconds
+
 /* ══════════ STATE ══════════ */
-let state = { screen: "start", courseId: "", subject: "", questions: [], current: 0, answers: {}, submitted: false };
+let state = {
+  screen: "name", // name → password → quiz → results
+  studentName: "",
+  questions: [],
+  current: 0,
+  answers: {},
+  submitted: false,
+  timeLeft: TOTAL_TIME,
+  timedOut: false
+};
+let timerInterval = null;
 
 /* ══════════ HELPERS ══════════ */
-function shuffle(a) { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function shuffle(a) {
+  a = [...a];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 function prepareQuestions(raw) {
   return shuffle(raw).map(([q, opts, correct]) => {
     const correctText = opts[correct];
-    const shuffled = shuffle(opts.map((o, i) => ({ text: o, orig: i })));
-    return { question: q, options: shuffled.map(s => s.text), correctIndex: shuffled.findIndex(s => s.text === correctText) };
+    const shuffled = shuffle(opts.map((o) => ({ text: o })));
+    return {
+      question: q,
+      options: shuffled.map(s => s.text),
+      correctIndex: shuffled.findIndex(s => s.text === correctText)
+    };
   });
 }
 
 function letter(i) { return String.fromCharCode(65 + i); }
 
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m + ":" + (sec < 10 ? "0" : "") + sec;
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    state.timeLeft--;
+    updateTimerDisplay();
+    if (state.timeLeft <= 0) {
+      clearInterval(timerInterval);
+      state.timedOut = true;
+      state.submitted = true;
+      render();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById("timer-time");
+  const bar = document.getElementById("timer-bar-fill");
+  if (el) {
+    el.textContent = formatTime(state.timeLeft);
+    const warn = state.timeLeft <= 60;
+    el.className = "timer-time" + (warn ? " warn" : "");
+    if (bar) {
+      const pct = (state.timeLeft / TOTAL_TIME) * 100;
+      bar.style.width = pct + "%";
+      bar.className = "timer-progress-bar" + (warn ? " warn" : "");
+    }
+  }
+}
+
+function stopTimer() { clearInterval(timerInterval); }
+
 function render() {
   const app = document.getElementById("app");
-  if (state.screen === "start") app.innerHTML = renderStart();
-  else if (state.submitted) app.innerHTML = renderResults();
+  if (state.screen === "name") app.innerHTML = renderName();
+  else if (state.screen === "password") app.innerHTML = renderPassword();
+  else if (state.submitted) { stopTimer(); app.innerHTML = renderResults(); }
   else app.innerHTML = renderQuiz();
   bindEvents();
 }
 
-/* ══════════ START SCREEN ══════════ */
-function renderStart() {
-  const subjects = state.courseId ? Object.keys(EXAMS[state.courseId] || {}) : [];
-  const canStart = state.courseId && state.subject;
-  let subjectHTML = "";
-  if (subjects.length) {
-    subjectHTML = `<div class="label">Materia</div><div class="btn-row col mb24">` +
-      subjects.map(s => {
-        const icon = s === "Ciencias Sociales" ? "🌍" : "📖";
-        const count = EXAMS[state.courseId][s].length;
-        return `<button class="btn${state.subject === s ? " active" : ""}" data-action="subject" data-val="${s}">${icon} ${s}<span class="subject-count">${count} preguntas</span></button>`;
-      }).join("") + `</div>`;
-  }
-  return `<div class="full-center"><div class="card" style="max-width:440px;width:100%">
-    <div class="center mb24"><div class="emoji">📝</div><h1>Olimpiadas Quiz</h1><p class="sub">Selecciona tu curso y materia para comenzar</p></div>
-    <div class="label">Curso</div>
-    <div class="btn-row mb20">${COURSES.map(c => `<button class="btn${state.courseId === c.id ? " active" : ""}" style="flex:1;text-align:center" data-action="course" data-val="${c.id}">${c.label}</button>`).join("")}</div>
-    ${subjectHTML}
-    <button class="btn-primary" ${canStart ? "" : "disabled"} data-action="start">Comenzar examen</button>
+/* ══════════ NAME SCREEN ══════════ */
+function renderName() {
+  return `<div class="full-center"><div class="card" style="max-width:420px;width:100%">
+    <div class="center mb24">
+      <div class="emoji-lg">📝</div>
+      <h1>Examen de Lenguaje</h1>
+      <p class="sub">2° de Primaria</p>
+    </div>
+    <div class="label">¿Cómo te llamas?</div>
+    <input class="input" id="nameInput" type="text" placeholder="Escribe tu nombre completo" autocomplete="off" autofocus>
+    <button class="btn-primary" id="btnName" disabled>Continuar</button>
+  </div></div>`;
+}
+
+/* ══════════ PASSWORD SCREEN ══════════ */
+function renderPassword() {
+  return `<div class="full-center"><div class="card" style="max-width:420px;width:100%">
+    <div class="center mb24">
+      <div class="emoji-lg">🔒</div>
+      <h1>Contraseña</h1>
+      <p class="sub">Ingresa la contraseña para comenzar el examen</p>
+    </div>
+    <div class="student-name center mb16">👋 Hola, ${state.studentName}</div>
+    <div class="label">Contraseña</div>
+    <input class="input" id="passInput" type="password" placeholder="Ingresa la contraseña" autocomplete="off" autofocus>
+    <div class="error-msg" id="passError">Contraseña incorrecta. Intenta de nuevo.</div>
+    <button class="btn-primary" id="btnPass">Ingresar</button>
   </div></div>`;
 }
 
@@ -269,13 +245,24 @@ function renderQuiz() {
   const answered = Object.keys(state.answers).length;
   const pct = ((state.current + 1) / total) * 100;
   const isLast = state.current >= total - 1;
+  const warn = state.timeLeft <= 60;
 
   return `<div class="container">
+    <div class="timer-bar">
+      <div class="timer-left">
+        <span class="timer-icon">⏱️</span>
+        <span id="timer-time" class="timer-time${warn ? " warn" : ""}">${formatTime(state.timeLeft)}</span>
+      </div>
+      <span class="timer-name">${state.studentName}</span>
+    </div>
+    <div class="timer-progress"><div id="timer-bar-fill" class="timer-progress-bar${warn ? " warn" : ""}" style="width:${(state.timeLeft / TOTAL_TIME) * 100}%"></div></div>
+
     <div class="header-row">
-      <span style="font-size:13px;font-weight:600;color:#4F46E5">${state.subject}</span>
+      <span style="font-size:13px;font-weight:600;color:#4F46E5">Lenguaje · 2° Primaria</span>
       <span class="sub-sm">${answered}/${total} respondidas</span>
     </div>
     <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%"></div></div>
+
     <div class="card mb16">
       <div class="q-header"><span class="q-number">${state.current + 1}</span><span class="sub-sm">de ${total}</span></div>
       <p class="q-text">${q.question}</p>
@@ -284,12 +271,14 @@ function renderQuiz() {
         return `<button class="opt-btn${sel ? " selected" : ""}" data-action="answer" data-val="${i}"><span class="opt-letter">${letter(i)}</span>${o}</button>`;
       }).join("")}</div>
     </div>
+
     <div class="nav-row">
       <button class="btn-outline" ${state.current === 0 ? "disabled" : ""} data-action="prev">← Anterior</button>
       ${isLast
         ? `<button class="btn-finish" data-action="finish">Finalizar ✓</button>`
         : `<button class="btn-nav" data-action="next">Siguiente →</button>`}
     </div>
+
     <div class="dots">${state.questions.map((_, i) => {
       let cls = "dot";
       if (i === state.current) cls += " current";
@@ -306,15 +295,21 @@ function renderResults() {
   const pct = Math.round((score / total) * 100);
   const pass = pct >= 60;
   const emoji = pct >= 80 ? "🏆" : pct >= 60 ? "👍" : pct >= 40 ? "💪" : "📚";
+  const answered = Object.keys(state.answers).length;
 
   const wrong = state.questions
     .map((q, i) => ({ ...q, idx: i, userAns: state.answers[i] }))
     .filter(q => q.userAns !== q.correctIndex);
 
+  let timeoutBadge = "";
+  if (state.timedOut) {
+    timeoutBadge = `<div class="timeout-badge">⏱️ Tiempo agotado · ${answered}/${total} respondidas</div>`;
+  }
+
   let wrongHTML = "";
   if (wrong.length) {
     wrongHTML = `<div class="card-sm" style="margin-top:20px">
-      <h3 style="color:#DC2626"><span>✗</span> Preguntas incorrectas (${wrong.length})</h3>
+      <h3 style="font-size:16px;color:#DC2626;margin:0 0 16px;display:flex;align-items:center;gap:8px"><span>✗</span> Preguntas incorrectas (${wrong.length})</h3>
       ${wrong.map((w, i) => {
         const yours = w.userAns !== undefined
           ? `<div class="wrong-yours"><span class="icon-circle icon-wrong">✗</span>Tu respuesta: ${w.options[w.userAns]}</div>`
@@ -331,9 +326,11 @@ function renderResults() {
   return `<div class="container">
     <div class="card center">
       <div style="font-size:56px">${emoji}</div>
-      <h2>Resultados del examen</h2>
-      <p class="sub-sm" style="margin-bottom:20px">${state.subject}</p>
-      <div class="score-box ${pass ? "pass" : "fail"}">
+      <h2>Resultados</h2>
+      <div class="student-name mb8">${state.studentName}</div>
+      <p class="sub-sm mb20">Lenguaje · 2° de Primaria</p>
+      ${timeoutBadge}
+      <div class="score-box ${pass ? "pass" : "fail"}" style="margin-top:16px">
         <span class="score-num ${pass ? "pass" : "fail"}">${score}</span>
         <span class="score-total">/ ${total}</span>
       </div>
@@ -349,31 +346,82 @@ function renderResults() {
 
 /* ══════════ EVENT BINDING ══════════ */
 function bindEvents() {
+  // Name screen
+  const nameInput = document.getElementById("nameInput");
+  const btnName = document.getElementById("btnName");
+  if (nameInput && btnName) {
+    nameInput.addEventListener("input", () => {
+      btnName.disabled = nameInput.value.trim().length === 0;
+    });
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && nameInput.value.trim()) {
+        state.studentName = nameInput.value.trim();
+        state.screen = "password";
+        render();
+      }
+    });
+    btnName.addEventListener("click", () => {
+      state.studentName = nameInput.value.trim();
+      state.screen = "password";
+      render();
+    });
+    nameInput.focus();
+  }
+
+  // Password screen
+  const passInput = document.getElementById("passInput");
+  const btnPass = document.getElementById("btnPass");
+  const passError = document.getElementById("passError");
+  if (passInput && btnPass) {
+    const tryPassword = () => {
+      if (passInput.value === "1234") {
+        state.screen = "quiz";
+        state.questions = prepareQuestions(QUESTIONS_RAW);
+        state.answers = {};
+        state.current = 0;
+        state.submitted = false;
+        state.timedOut = false;
+        state.timeLeft = TOTAL_TIME;
+        render();
+        startTimer();
+      } else {
+        passInput.classList.add("error");
+        if (passError) passError.classList.add("show");
+        passInput.value = "";
+        passInput.focus();
+      }
+    };
+    passInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") tryPassword();
+      else { passInput.classList.remove("error"); if (passError) passError.classList.remove("show"); }
+    });
+    btnPass.addEventListener("click", tryPassword);
+    passInput.focus();
+  }
+
+  // Quiz & results actions
   document.querySelectorAll("[data-action]").forEach(el => {
     el.addEventListener("click", () => {
       const action = el.dataset.action;
       const val = el.dataset.val;
       switch (action) {
-        case "course": state.courseId = val; state.subject = ""; break;
-        case "subject": state.subject = val; break;
-        case "start":
-          if (state.courseId && state.subject) {
-            state.questions = prepareQuestions(EXAMS[state.courseId][state.subject]);
-            state.answers = {}; state.current = 0; state.submitted = false; state.screen = "quiz";
-          } break;
         case "answer": state.answers = { ...state.answers, [state.current]: parseInt(val) }; break;
         case "prev": state.current = Math.max(0, state.current - 1); break;
         case "next": state.current = Math.min(state.questions.length - 1, state.current + 1); break;
         case "goto": state.current = parseInt(val); break;
-        case "finish": state.submitted = true; break;
+        case "finish": stopTimer(); state.submitted = true; break;
         case "retry":
-          state.questions = prepareQuestions(EXAMS[state.courseId][state.subject]);
-          state.answers = {}; state.current = 0; state.submitted = false; break;
+          state.questions = prepareQuestions(QUESTIONS_RAW);
+          state.answers = {}; state.current = 0; state.submitted = false;
+          state.timedOut = false; state.timeLeft = TOTAL_TIME;
+          render(); startTimer(); return;
         case "home":
-          state = { screen: "start", courseId: "", subject: "", questions: [], current: 0, answers: {}, submitted: false }; break;
+          stopTimer();
+          state = { screen: "name", studentName: "", questions: [], current: 0, answers: {}, submitted: false, timeLeft: TOTAL_TIME, timedOut: false };
+          break;
       }
       render();
-      window.scrollTo(0, 0);
+      if (action === "finish" || action === "home") window.scrollTo(0, 0);
     });
   });
 }
